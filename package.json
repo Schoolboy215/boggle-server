@@ -1,0 +1,16 @@
+{
+  "name": "boggle-server",
+  "version": "0.1.0",
+  "description": "a server to generate boggle puzzles with solutions and facilitate multiplayer clients",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "James McKay",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "sqlite3": "^4.0.2"
+  }
+}
