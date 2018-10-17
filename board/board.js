@@ -16,6 +16,28 @@ const cubes = [
     ['H','I','M','N','U','Qu'],
     ['H','L','N','N','R','Z']
 ]
+function findNeighbors(spot){
+    var neighbors = new Array();
+    if (spot%4){
+        neighbors.push(spot-1);     //LEFT
+        if (spot>3)
+            neighbors.push(spot-5); //ABOVE LEFT
+        if (spot<12)
+            neighbors.push(spot+3); //BELOW LEFT
+    }
+    if (spot>3)
+        neighbors.push(spot-4);     //ABOVE CENTER
+    if (spot==0 || spot %3) {
+        neighbors.push(spot+1);     //RIGHT
+        if (spot>3)
+            neighbors.push(spot-3); //ABOVE RIGHT
+        if (spot<12)
+            neighbors.push(spot+5); //BELOW RIGHT
+    }
+    if (spot < 12)
+        neighbors.push(spot+4);     //BELOW CENTER
+    return neighbors;
+}
 module.exports = class Board {
     constructor() {
         this.squares = [];
@@ -31,6 +53,17 @@ module.exports = class Board {
             this.squares[filled] = cubes[spot][Math.floor(Math.random() * 6)]
             used[spot] = true;
             filled++;
+        }
+    }
+
+    solveWords() {
+        for (var y = 0; y < 4; y++)
+        {
+            for (var x = 0; x < 4; x++)
+            {
+                var spot = y*4 + x;
+                console.log(findNeighbors(spot));
+            }
         }
     }
 
