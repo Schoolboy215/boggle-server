@@ -40,6 +40,7 @@ function findNeighbors(spot){
     }
     if (spot < 12)
         neighbors.push(spot+4);     //BELOW CENTER
+    neighbors = neighbors.sort();
     return neighbors;
 }
 module.exports = class Board {
@@ -68,11 +69,10 @@ module.exports = class Board {
                 for (var x = 0; x < 4; x++)
                 {
                     var spot = y*4 + x;
-                    await this.solveSpot(spot, [spot], this.squares[spot]);
+                    await this.solveSpot(spot, [], this.squares[spot]);
                 }
             }
             this.words = this.words.sort();
-            console.log("Board solving complete");
             resolve();
         });
     }
@@ -82,6 +82,7 @@ module.exports = class Board {
         var used    = [..._used];
         var soFar   = _soFar;
 
+        used.push(spot);
         return new Promise( async (resolve,reject) => {
             var neighbors = findNeighbors(spot);
             for (var i = 0; i < neighbors.length; i++)
@@ -96,9 +97,7 @@ module.exports = class Board {
                         if (words.includes(building) && !this.words.includes(building))
                         {
                             this.words.push(building);
-                            console.log(building);
                         }
-                        used.push(s);
                         await this.solveSpot(s, used, building);
                     }
                 }
