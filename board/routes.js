@@ -7,8 +7,9 @@ var appRouter = function(app) {
     app.get("/boards/create", (req,res) => {
         var b = new Board();
         b.fillSquares();
-        b.solveWords();
-        res.send(b);
+        b.solveBoard().then(() => {
+            res.send(b);
+        });
     });
 }
 

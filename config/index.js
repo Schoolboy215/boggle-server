@@ -2,10 +2,19 @@ var fs = require('fs');
 
 const sqlite3 = require('sqlite3').verbose();
 
+var inMemDB = null;
+var diskDB = null;
+var loaded = false;
+
 exports.init = function(){
     return new Promise((resolve,reject) => {
         checkForDict().then((result) => {
-            resolve(result);
+            createInMemDB().then( (db) => {
+                this.inMemDB = db;
+                this.loaded = true;
+                this.diskDB = new sqlite3.Database('./config/dict.sqlite');
+                resolve(result);
+            });
         });
     });
 }
@@ -75,42 +84,32 @@ function createDictFromFile(){
             reject("No dictionary.txt file was found. Place a file with this name in the config directory");
     });
 }
-function createInMemoryCopyOfDB(disk_db, new_db){
-    return new Promise((resolve,reject) => {
-        disk_db.get("SELECT COUNT(*) FROM WORDS", (err,row) => {
-            var waitFor = row["COUNT(*)"];
-            var doneSoFar = 0;
-            
-            new_db.run('CREATE TABLE words(word text)');
-            new_db.serialize(function() {
-                new_db.run("BEGIN TRANSACTION");
-                disk_db.each('select * from words', (err, row) => {
-                    new_db.serialize(function() {
-                        new_db.run("INSERT INTO words(word) VALUES('" + row.word+"')");
-                        doneSoFar++;
-                    });
-                    if (doneSoFar == waitFor)
-                    {
-                        new_db.run("COMMIT");
-                        resolve("done");
-                    }
-                });
-            });
+function createInMemDB() {
+    disk_db = new sqlite3.Database('./config/dict.sqlite');
+    mem_db = new sqlite3.Database(':memory:');
+
+    return new Promise (resolve => {
+        mem_db.serialize(function() {
+            mem_db.run('CREATE TABLE words(word text)');
+            mem_db.run("BEGIN TRANSACTION");
+            disk_db.all("select * from words", function(err, rows) {
+                rows.forEach(function (row) {
+                    mem_db.run("INSERT INTO words(word) VALUES('" + row.word+"')");
+                })
+                mem_db.run("COMMIT");
+                resolve(mem_db);
+            });	
         });
     });
 }
-exports.testDB = function(word){
-    return new Promise((resolve, reject) => {
-        let old_db = new sqlite3.Database('./config/dict.sqlite');
-        let new_db = new sqlite3.Database(':memory:');
-        createInMemoryCopyOfDB(old_db,new_db).then((result) => {
-            var matches = new Array();
-            new_db.all("select word from words where word like '" + word + "%'", (err, rows) => {
-                rows.forEach((row) => {
-                    matches.push(row.word);
-                });
-                resolve(matches);
+exports.findWord = function(word){
+    return new Promise(resolve => {
+        var matches = new Array();
+        this.inMemDB.all("select word from words where word like '" + word + "%'", (err, rows) => {
+            rows.forEach((row) => {
+                matches.push(row.word);
             });
-        }); 
+            resolve(matches);
+        });
     });
 }

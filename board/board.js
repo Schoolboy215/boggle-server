@@ -16,6 +16,10 @@ const cubes = [
     ['H','I','M','N','U','Qu'],
     ['H','L','N','N','R','Z']
 ]
+
+var config = require("../config");
+var stack = []
+
 function findNeighbors(spot){
     var neighbors = new Array();
     if (spot%4){
@@ -27,7 +31,7 @@ function findNeighbors(spot){
     }
     if (spot>3)
         neighbors.push(spot-4);     //ABOVE CENTER
-    if (spot==0 || spot %3) {
+    if (spot==0 || (spot+1) % 4) {
         neighbors.push(spot+1);     //RIGHT
         if (spot>3)
             neighbors.push(spot-3); //ABOVE RIGHT
@@ -41,6 +45,7 @@ function findNeighbors(spot){
 module.exports = class Board {
     constructor() {
         this.squares = [];
+        this.words = [];
     }
 
     fillSquares() {
@@ -56,16 +61,60 @@ module.exports = class Board {
         }
     }
 
-    solveWords() {
-        for (var y = 0; y < 4; y++)
-        {
-            for (var x = 0; x < 4; x++)
+    solveBoard() {
+        return new Promise( async (resolve,reject) => {
+            for (var y = 0; y < 4; y++)
             {
-                var spot = y*4 + x;
-                console.log(findNeighbors(spot));
+                for (var x = 0; x < 4; x++)
+                {
+                    var spot = y*4 + x;
+                    await this.solveSpot(spot, [spot], this.squares[spot]);
+                }
             }
-        }
+            this.words = this.words.sort();
+            console.log("Board solving complete");
+            resolve();
+        });
     }
+
+    solveSpot(_spot, _used, _soFar) {
+        var spot    = _spot;
+        var used    = [..._used];
+        var soFar   = _soFar;
+
+        return new Promise( async (resolve,reject) => {
+            var neighbors = findNeighbors(spot);
+            for (var i = 0; i < neighbors.length; i++)
+            {
+                var s = neighbors[i];
+                if (!used.includes(s))
+                {
+                    var building = (soFar + this.squares[s]).toLowerCase();
+                    var words = await this.checkWord(building);
+                    if (words.length)
+                    {
+                        if (words.includes(building) && !this.words.includes(building))
+                        {
+                            this.words.push(building);
+                            console.log(building);
+                        }
+                        used.push(s);
+                        await this.solveSpot(s, used, building);
+                    }
+                }
+            }
+            resolve();
+        });
+    }
+
+    checkWord(word) {
+        return new Promise((resolve,reject) => {
+            config.findWord(word).then(words => {
+                resolve(words);
+            });
+        });
+    }
+
 
     boardToJSON() {
         return JSON.stringify(this.squares);
