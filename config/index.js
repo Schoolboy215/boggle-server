@@ -59,6 +59,8 @@ function createDictFromFile(){
                     console.log('database file opened');
             });
             db.run('CREATE TABLE words(word text)');
+            db.run('CREATE TABLE addWords(word text)');
+            db.run('CREATE TABLE removeWords(word text)')
 
             var rawDict = fs.createReadStream('./config/dictionary.txt');
             var wordsToInsert = new Array();
@@ -102,7 +104,7 @@ function createInMemDB() {
         });
     });
 }
-exports.findWord = function(word){
+exports.findWord = function(word) {
     return new Promise(resolve => {
         var matches = new Array();
         this.inMemDB.all("select word from words where word like '" + word + "%'", (err, rows) => {
@@ -112,4 +114,19 @@ exports.findWord = function(word){
             resolve(matches);
         });
     });
+}
+exports.addWordRequest = function(words) {
+    words.forEach(word => {
+        word = word.toLowerCase()
+        this.diskDB.run("INSERT INTO addWords(word) VALUES('" + word +"')");
+    })
+    return "Word insertion request processed";
+}
+
+exports.removeWordRequest = function(words) {
+    words.forEach(word => {
+        word = word.toLowerCase()
+        this.diskDB.run("INSERT INTO removeWords(word) VALUES('" + word +"')");
+    })
+    return "Word removal request processed";
 }

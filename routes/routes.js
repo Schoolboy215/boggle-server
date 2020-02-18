@@ -4,6 +4,7 @@ var appRouter = function(app) {
     });
 
     require("../board/routes.js")(app);
+    require("../config/routes.js")(app);
 }
 
 module.exports = appRouter;
