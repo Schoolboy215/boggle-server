@@ -14,7 +14,7 @@ KEY_PATH="/path/to/key.pem"
 PORT=443
 ```
 
-Additionally, the ` CA ` field is optional and points to a ` .chain ` file if you're using a certificate from an authority
+Additionally, the ` CA ` field is optional and points to a ` chain.pem ` file if you're using a certificate from an authority
 
 #### Setting up for certbot ####
 If you're using the guide linked above and need to validate your domain, you can run the ` certSetup.js ` server temporarily.

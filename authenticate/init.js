@@ -3,6 +3,24 @@ var passport = require('passport')
 
 var crypto = require('crypto');
 var sqlite3 = require('sqlite3');
+const fs = require('fs');
+
+if (fs.existsSync('authenticate/users.sqlite')) {
+    resolve("User database was found");
+}
+else
+{
+    console.warn("Users database was not found");
+    let db = new sqlite3.Database('authenticate/users.sqlite', (err) => {
+        if (err)
+            throw(err);
+        else
+            console.log('database file opened');
+    });
+    db.run('CREATE TABLE "users" ( "id" INTEGER PRIMARY KEY AUTOINCREMENT, "username" TEXT, "password" TEXT, "salt" TEXT )');
+    db.close();
+    console.log("Users db created");
+}
 
 var db = new sqlite3.Database('authenticate/users.sqlite');
 
