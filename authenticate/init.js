@@ -6,7 +6,7 @@ var sqlite3 = require('sqlite3');
 const fs = require('fs');
 
 if (fs.existsSync('authenticate/users.sqlite')) {
-    resolve("User database was found");
+    console.log("User database was found");
 }
 else
 {
