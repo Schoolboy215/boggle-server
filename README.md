@@ -4,6 +4,7 @@ Node server to create boggle boards and facilitate multiplayer clients
 ## Setup ##
 * Clone repository and run npm install
 * Before attempting to run, make sure you have your .env file set up. This will require a certificate and key for SSL. Follow a guide similar to this (https://itnext.io/node-express-letsencrypt-generate-a-free-ssl-certificate-and-run-an-https-server-in-5-minutes-a730fbe528ca)
+* ` sudo nodejs main.js `
 
 The .env file needs to contain the following fields
 ```env
@@ -14,6 +15,9 @@ PORT=443
 ```
 
 Additionally, the ` CA ` field is optional and points to a ` .chain ` file if you're using a certificate from an authority
+
+#### Setting up for certbot ####
+If you're using the guide linked above and need to validate your domain, you can run the ` certSetup.js ` server temporarily.
 
 ## Usage ##
 After the server is up and running, you can navigate to the root and go to the login page. This will let you sign up with your new username/password.
