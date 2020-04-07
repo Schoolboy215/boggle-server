@@ -9,10 +9,10 @@ var loaded = false;
 exports.init = function(){
     return new Promise((resolve,reject) => {
         checkForDict().then((result) => {
-            createInMemDB().then( (db) => {
+            this.diskDB = new sqlite3.Database('./config/dict.sqlite');
+            createInMemDB(this.diskDB).then( (db) => {
                 this.inMemDB = db;
                 this.loaded = true;
-                this.diskDB = new sqlite3.Database('./config/dict.sqlite');
                 resolve(result);
             });
         });
@@ -86,15 +86,14 @@ function createDictFromFile(){
             reject("No dictionary.txt file was found. Place a file with this name in the config directory");
     });
 }
-function createInMemDB() {
-    disk_db = new sqlite3.Database('./config/dict.sqlite');
+function createInMemDB(_diskDB) {
     mem_db = new sqlite3.Database(':memory:');
 
     return new Promise (resolve => {
         mem_db.serialize(function() {
             mem_db.run('CREATE TABLE words(word text)');
             mem_db.run("BEGIN TRANSACTION");
-            disk_db.all("select * from words", function(err, rows) {
+            _diskDB.all("select * from words", function(err, rows) {
                 rows.forEach(function (row) {
                     mem_db.run("INSERT INTO words(word) VALUES('" + row.word+"')");
                 })
@@ -183,7 +182,7 @@ exports.processRequests = function(reqBody) {
         this.diskDB.run("DELETE FROM addWords");
         this.diskDB.run("DELETE FROM removeWords");
         
-        await createInMemDB();
+        await createInMemDB(this.diskDB);
         resolve("finished");
     });
 }
