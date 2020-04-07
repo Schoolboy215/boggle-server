@@ -1,12 +1,13 @@
 var config = require("../config");
 
-var appRouter = function(app) {
-    app.post("/words/add", (req,res) => {
-        res.status(200).send(config.addWordRequest(req.body))
-    })
-    app.post("/words/remove", (req,res) => {
-        res.status(200).send(config.removeWordRequest(req.body))
-    })
-}
+var express = require('express');
+var router = express.Router();
 
-module.exports = appRouter;
+router.post("/add", (req,res) => {
+    res.status(200).send(config.addWordRequest(req.body))
+})
+router.post("/remove", (req,res) => {
+    res.status(200).send(config.removeWordRequest(req.body))
+})
+
+module.exports = router;

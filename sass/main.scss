@@ -1,0 +1,9 @@
+@import "../node_modules/bootstrap/scss/functions";
+@import "../node_modules/bootstrap/scss/variables";
+
+//Overrides here
+$theme-colors: (
+  "primary": $cyan,
+  "secondary": $teal
+);
+@import "../node_modules/bootstrap/scss/bootstrap";

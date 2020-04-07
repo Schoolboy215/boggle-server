@@ -1,0 +1,33 @@
+<h1 class="display-4">Login here</h1>
+<hr>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <form method="post">
+                <div class="form-group row">
+                    <label class="col-md-auto col-form-label">Username</label>
+                    <div class="col">
+                        <input type="text" name="username" class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-md-auto col-form-label">Password</label>
+                    <div class="col">
+                        <input type="password" name="password" class="form-control"//>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-auto">
+                        <button type="submit" formaction="/auth/login" value="Log In" class="btn btn-primary">Log in</button>
+                    </div>
+                    <div class="col-sm-auto">
+                        <button type="submit" formaction="/auth/signup" value="Sign up" class="btn btn-secondary">Sign up</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col">
+            <p>This site is designed to be operated by a single user. After the first sign up, further attempts will fail so make sure you don't forget your information.</p>
+        </div>
+    </div>
+</div>
