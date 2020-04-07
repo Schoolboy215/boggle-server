@@ -122,11 +122,68 @@ exports.addWordRequest = function(words) {
     })
     return "Word insertion request processed";
 }
-
 exports.removeWordRequest = function(words) {
     words.forEach(word => {
         word = word.toLowerCase()
         this.diskDB.run("INSERT INTO removeWords(word) VALUES('" + word +"')");
     })
     return "Word removal request processed";
+}
+exports.getAdditionRequests = function() {
+    return new Promise (resolve => {
+        var words = new Array();
+        this.diskDB.all("select word from addWords", (err, rows) => {
+            if (rows)
+            {
+                rows.forEach((row) => {
+                    words.push(row.word);
+                });
+            }
+            resolve(words);
+        });
+    });
+}
+exports.getRemovalRequests = function() {
+    return new Promise (resolve => {
+        var words = new Array();
+        this.diskDB.all("select word from removeWords", (err, rows) => {
+            if (rows)
+            {
+                rows.forEach((row) => {
+                    words.push(row.word);
+                });
+            }
+            resolve(words);
+        });
+    });
+}
+exports.processRequests = function(reqBody) {
+    return new Promise (async resolve => {
+        var addRequests     = await this.getAdditionRequests();
+        var removeRequests  = await this.getRemovalRequests();
+        var adding = new Array();
+        var removing = new Array();
+        for (var key in reqBody){
+            var current = key.split(":");
+            if (current[0] == "add" && addRequests.includes(current[1]))
+            {
+                adding.push(current[1]);
+            }
+            else if(current[0] == "remove" && removeRequests.includes(current[1]))
+            {
+                removing.push(current[1]);
+            }
+        }
+        adding.forEach(word => {
+            this.diskDB.run("INSERT INTO words(word) VALUES('" + word +"')");
+        });
+        removing.forEach(word => {
+            this.diskDB.run("DELETE FROM words WHERE word = '" + word +"'");
+        });
+        this.diskDB.run("DELETE FROM addWords");
+        this.diskDB.run("DELETE FROM removeWords");
+        
+        await createInMemDB();
+        resolve("finished");
+    });
 }
