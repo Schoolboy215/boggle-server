@@ -15,11 +15,13 @@ else
         if (err)
             throw(err);
         else
+        {
             console.log('database file opened');
+            db.run('CREATE TABLE "users" ( "id" INTEGER PRIMARY KEY AUTOINCREMENT, "username" TEXT, "password" TEXT, "salt" TEXT )');
+            db.close();
+            console.log("Users db created");
+        }
     });
-    db.run('CREATE TABLE "users" ( "id" INTEGER PRIMARY KEY AUTOINCREMENT, "username" TEXT, "password" TEXT, "salt" TEXT )');
-    db.close();
-    console.log("Users db created");
 }
 
 var db = new sqlite3.Database('authenticate/users.sqlite');

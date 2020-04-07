@@ -15,7 +15,7 @@ router.post('/signup', async function(req, res) {
     if (noUsers)
     {
         var result = await signupHandler.addUser(req.body["username"], req.body["password"]);
-        res.send(result);
+        res.redirect('/');
     }
     else
     {
