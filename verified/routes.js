@@ -23,5 +23,13 @@ function ensureAuthenticated(req, res, next) {
     }
 }
 
+function checkAPIToken(req, res, next) {
+    if (req.header("api_token") == config.getAPIToken() || req.header("api_token") == "")
+        return next();
+    else
+        res.status(401).send("Missing or invalid api_token in header");
+}
+
 module.exports.router = router;
 module.exports.ensureAuthenticated = ensureAuthenticated;
+module.exports.checkAPIToken = checkAPIToken;

@@ -1,13 +1,41 @@
 var fs = require('fs');
 
 const sqlite3 = require('sqlite3').verbose();
+const readline = require('readline');
 
 var inMemDB = null;
 var diskDB = null;
 var loaded = false;
+var apiToken = null;
 
 exports.init = function(){
-    return new Promise((resolve,reject) => {
+    return new Promise( async (resolve,reject) => {
+        if (!fs.existsSync('.apiToken'))
+            reject("No .apiToken file");
+        else
+        {
+            const stats = fs.statSync('.apiToken');
+            const fileSizeInBytes = stats.size;
+            if (fileSizeInBytes)
+            {
+                const rs = fs.createReadStream('.apiToken');
+                const reader = readline.createInterface({ input: rs });
+                const line = await new Promise((resolve) => {
+                    reader.on('line', (line) => {
+                        reader.close();
+                        resolve(line);
+                    });
+                });
+                rs.close();
+                this.apiToken = line;
+                console.log('API token loaded');
+            }
+            else
+            {
+                console.warn("API token file is empty. API is not secured");
+            }
+
+        }
         checkForDict().then((result) => {
             this.diskDB = new sqlite3.Database('./config/dict.sqlite');
             createInMemDB(this.diskDB).then( (db) => {
@@ -185,4 +213,7 @@ exports.processRequests = function(reqBody) {
         await createInMemDB(this.diskDB);
         resolve("finished");
     });
+}
+exports.getAPIToken = function() {
+    return this.apiToken;
 }

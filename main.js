@@ -90,8 +90,8 @@ var verifiedRouter = require('./verified/routes');
 
 app.use('/', indexRouter);
 app.use('/auth', authRouter);
-app.use('/api/boards', boardRouter);
-app.use('/api/words', configRouter);
+app.use('/api/boards', verifiedRouter.checkAPIToken, boardRouter);
+app.use('/api/words', verifiedRouter.checkAPIToken, configRouter);
 app.use('/verified', verifiedRouter.ensureAuthenticated, verifiedRouter.router);
 
 try{
