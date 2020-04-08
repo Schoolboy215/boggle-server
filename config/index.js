@@ -210,7 +210,7 @@ exports.processRequests = function(reqBody) {
         this.diskDB.run("DELETE FROM addWords");
         this.diskDB.run("DELETE FROM removeWords");
         
-        await createInMemDB(this.diskDB);
+        this.inMemDB = await createInMemDB(this.diskDB);
         resolve("finished");
     });
 }
