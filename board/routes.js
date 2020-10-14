@@ -6,12 +6,11 @@ var router = express.Router();
 router.get("/", (req,res) => {
     res.send("Board section");
 });
-router.get("/create", (req,res) => {
+router.get("/create", async (req,res) => {
     var b = new Board();
     b.fillSquares();
-    b.solveBoard().then(() => {
-        res.send(b);
-    });
+    await b.solveBoard();
+    res.send(b);
 });
 
 module.exports = router;

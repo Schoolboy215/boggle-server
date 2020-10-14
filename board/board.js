@@ -62,7 +62,7 @@ module.exports = class Board {
         }
     }
 
-    solveBoard() {
+    async solveBoard() {
         return new Promise( async (resolve,reject) => {
             for (var y = 0; y < 4; y++)
             {
