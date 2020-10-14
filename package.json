@@ -9,10 +9,12 @@
   "author": "James McKay",
   "license": "ISC",
   "dependencies": {
+    "ajv": "^6.12.3",
     "body-parser": "^1.18.3",
     "bootstrap": "^4.4.1",
     "connect-flash": "^0.1.1",
     "dotenv": "^8.2.0",
+    "dotenv-extended": "^2.8.0",
     "express": "^4.16.3",
     "express-handlebars": "^3.1.0",
     "express-session": "^1.17.0",
@@ -21,6 +23,8 @@
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "popper.js": "^1.16.1",
-    "sqlite3": "^4.0.2"
+    "source": "0.0.3",
+    "sqlite3": "^4.2.0",
+    "ws": "^7.3.1"
   }
 }

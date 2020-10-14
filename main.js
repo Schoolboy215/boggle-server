@@ -6,6 +6,8 @@ var path = require('path');
 var passport = require('passport');
 var session = require('express-session');
 var flash = require('connect-flash');
+var ws = require('ws');
+var wsHandler = require('./websocketHandler');
 
 require('dotenv').config();
 require('./authenticate/init');
@@ -98,9 +100,15 @@ try{
     config.init().then((result) => {
         console.log(result);
 
-        https.createServer(credentials, app)
-          .listen(process.env.PORT, function () {
+        const server = https.createServer(credentials, app);
+        server.listen(process.env.PORT, function () {
             console.log('listening on port ' + process.env.PORT.toString())
+        });
+
+        const wss = new ws.Server({ server });
+        var handler = new wsHandler.wsHandler();
+        wss.on('connection', (socket) => {
+            handler.handleConnection(socket);
         });
     });
 } catch(e) {

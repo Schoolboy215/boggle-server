@@ -1,0 +1,35 @@
+{
+    "properties": {
+        "status":
+        {
+            "type": "string",
+            "enum": ["ok", "error"]
+        },
+        "event":
+        {
+            "type": "string",
+            "enum": [
+                "createRoom",
+                "joinRoom",
+                "joinNotification",
+
+                "startGame",
+                "gameEnd",
+                "gameResults",
+                "foundWords",
+
+                "error",
+                "response"
+            ]
+        },
+        "data":
+        {
+            "type": "object"
+        }
+    },
+    "required": [
+        "status",
+        "event"
+    ],
+    "type":"object"
+}
