@@ -46,6 +46,17 @@ exports.init = function(){
         });
     });
 }
+exports.refreshAfterImport = function(){
+    return new Promise( async (resolve,reject) => {
+        await createDictFromFile();
+        this.diskDB = new sqlite3.Database('./config/dict.sqlite');
+        createInMemDB(this.diskDB).then( (db) => {
+            this.inMemDB = db;
+            this.loaded = true;
+            resolve();
+        });
+    });
+}
 function checkForDict(){
     return new Promise((resolve,reject) => {
         if (fs.existsSync('./config/dict.sqlite')) {
@@ -86,9 +97,12 @@ function createDictFromFile(){
                 else
                     console.log('database file opened');
             });
-            db.run('CREATE TABLE words(word text)');
-            db.run('CREATE TABLE addWords(word text)');
-            db.run('CREATE TABLE removeWords(word text)')
+            db.serialize(function() {
+                db.run('CREATE TABLE if not exists words(word text)');
+                db.run('CREATE TABLE if not exists addWords(word text)');
+                db.run('CREATE TABLE if not exists removeWords(word text)');
+                db.run('DELETE FROM words');
+            });
 
             var rawDict = fs.createReadStream('./config/dictionary.txt');
             var wordsToInsert = new Array();
@@ -226,6 +240,20 @@ exports.createNewDictFile = function(){
             writeStream.on('finish', () => {
                 resolve();
             });
+        });
+    });
+}
+exports.importDictFile = function(file){
+    return new Promise( async (resolve,reject) => {
+        if (fs.existsSync('./config/dictionary.txt'))
+        {
+            fs.unlinkSync('./config/dictionary.txt');
+        }
+        let writeStream = fs.createWriteStream('./config/dictionary.txt');
+        writeStream.write(file["data"]);
+        writeStream.end();
+        writeStream.on('finish', () => {
+            resolve();
         });
     });
 }

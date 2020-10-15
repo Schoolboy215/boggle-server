@@ -28,15 +28,19 @@ router.get('/dictionaryDownload', async function(req,res,next) {
 router.post('/dictionaryUpload', async (req, res) => {
     try {
         if(!req.files) {
-            console.log("file not uploaded")
+            req.flash("error_message", "No file specified");
+            res.redirect('./settings');
+            return;
         } else {
-            console.log('file uploaded');
+            await config.importDictFile(req.files["dictInput"]);
+            await config.refreshAfterImport();
+            req.flash("success_message", "Done");
+            res.redirect('./settings');
         }
     } catch (err) {
-        console.log(err);
+        req.flash("error_message", err);
+        res.redirect('./settings');
     }
-    req.flash("success_message", "Done");
-    res.redirect('./settings');
 });
 
 function ensureAuthenticated(req, res, next) {
