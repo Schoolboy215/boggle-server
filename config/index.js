@@ -106,8 +106,11 @@ function createDictFromFile(){
                 });
                 console.log(wordsToInsert.length + " words added to database.");
                 db.close();
-                console.log('database closed');
-                resolve("Dict sqlite database created and saved");
+                db.on('close', () => {
+                    console.log('database closed');
+                    rawDict.close();
+                    resolve("Dict sqlite database created and saved");
+                });
             });
         }
         else
@@ -216,4 +219,24 @@ exports.processRequests = function(reqBody) {
 }
 exports.getAPIToken = function() {
     return this.apiToken;
+}
+exports.createNewDictFile = function(){
+    return new Promise( async (resolve,reject) => {
+        var dictString = "";
+        if (fs.existsSync('./config/dictionary.txt'))
+        {
+            fs.unlinkSync('./config/dictionary.txt');
+        }
+        this.inMemDB.all("select * from words", function(err, rows) {
+            rows.forEach(function (row) {
+                dictString += row.word + "\n";
+            });
+            let writeStream = fs.createWriteStream('./config/dictionary.txt');
+            writeStream.write(dictString);
+            writeStream.end();
+            writeStream.on('finish', () => {
+                resolve();
+            });
+        });
+    });
 }
