@@ -1,0 +1,18 @@
+<h1 class="display-4">Server settings</h1>
+<p class="lead">This is where you can do things like change the server's API key, export/import the dictionary it uses, and set defaults for games.</p>
+<hr>
+<form   ref='uploadForm' 
+        id='uploadForm' 
+        action='./dictionaryUpload' 
+        method='post' 
+        encType="multipart/form-data">
+    <div class="input-group mb-3">
+        <a class="btn btn-primary" href="./dictionaryDownload" role="button">Download dictionary</a>
+    </div>
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="uploadGroup">Dictionary upload</span>
+        </div>
+        <input id="input-b2" name="input-b2" type="file" class="file" data-show-preview="false">
+    </div>
+</form> 

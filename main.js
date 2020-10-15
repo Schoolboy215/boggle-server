@@ -8,6 +8,7 @@ var session = require('express-session');
 var flash = require('connect-flash');
 var ws = require('ws');
 var wsHandler = require('./websocketHandler');
+var fileUpload = require('express-fileupload');
 
 require('dotenv').config();
 require('./authenticate/init');
@@ -41,6 +42,11 @@ else
 const sqlite3 = require('sqlite3').verbose();
 
 var app = express();
+
+// enable files upload
+app.use(fileUpload({
+    createParentPath: true
+}));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -82,6 +88,7 @@ app.use(function(req, res, next){
 app.use(express.static(path.join(__dirname, 'public'), { dotfiles: 'allow' }));
 //Expose our node_module versions of js libraries
 app.use("/bootstrap",express.static(__dirname + '/node_modules/bootstrap/dist'));
+app.use("/bootstrap-fileInput",express.static(__dirname + '/node_modules/bootstrap-fileinput/js'));
 app.use("/popper",express.static(__dirname + '/node_modules/popper.js/dist'));
 app.use("/jquery",express.static(__dirname + '/node_modules/jquery/dist'));
 

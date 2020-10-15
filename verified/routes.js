@@ -15,10 +15,28 @@ router.post('/processChanges', async function(req,res,next) {
     res.redirect('/');
 });
 
+//Settings screen
+router.get('/settings', async function(req,res,next) {
+    res.render('settings');
+});
+
 //Dictionary file related routes
 router.get('/dictionaryDownload', async function(req,res,next) {
     await config.createNewDictFile();
     res.download(`config/dictionary.txt`);
+});
+router.post('/dictionaryUpload', async (req, res) => {
+    try {
+        if(!req.files) {
+            console.log("file not uploaded")
+        } else {
+            console.log('file uploaded');
+        }
+    } catch (err) {
+        console.log(err);
+    }
+    req.flash("success_message", "Done");
+    res.redirect('./settings');
 });
 
 function ensureAuthenticated(req, res, next) {
