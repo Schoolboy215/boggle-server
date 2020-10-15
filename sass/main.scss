@@ -1,6 +1,5 @@
 @import "../node_modules/bootstrap/scss/functions";
 @import "../node_modules/bootstrap/scss/variables";
-@import "../node_modules/bootstrap-fileinput/scss/fileinput.scss";
 
 //Overrides here
 $theme-colors: (
@@ -8,3 +7,4 @@ $theme-colors: (
   "secondary": $teal
 );
 @import "../node_modules/bootstrap/scss/bootstrap";
+@import "../node_modules/bootstrap-fileinput/scss/fileinput";
