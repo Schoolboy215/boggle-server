@@ -123,14 +123,9 @@ function createInMemDB(_diskDB) {
     return new Promise (resolve => {
         mem_db.serialize(function() {
             mem_db.run('CREATE TABLE words(word text)');
-            mem_db.run("BEGIN TRANSACTION");
-            _diskDB.all("select * from words", function(err, rows) {
-                rows.forEach(function (row) {
-                    mem_db.run("INSERT INTO words(word) VALUES('" + row.word+"')");
-                })
-                mem_db.run("COMMIT");
-                resolve(mem_db);
-            });	
+            mem_db.run("ATTACH './config/dict.sqlite' AS src;");
+            mem_db.run("INSERT INTO words SELECT * FROM src.words");
+            resolve(mem_db);
         });
     });
 }
@@ -138,10 +133,7 @@ exports.findWord = function(word) {
     return new Promise(resolve => {
         var matches = new Array();
         this.inMemDB.all("select word from words where word like '" + word + "%'", (err, rows) => {
-            rows.forEach((row) => {
-                matches.push(row.word);
-            });
-            resolve(matches);
+            resolve(rows.map(row => row.word));
         });
     });
 }
@@ -222,15 +214,12 @@ exports.getAPIToken = function() {
 }
 exports.createNewDictFile = function(){
     return new Promise( async (resolve,reject) => {
-        var dictString = "";
         if (fs.existsSync('./config/dictionary.txt'))
         {
             fs.unlinkSync('./config/dictionary.txt');
         }
         this.inMemDB.all("select * from words", function(err, rows) {
-            rows.forEach(function (row) {
-                dictString += row.word + "\n";
-            });
+            var dictString = rows.reduce((newString, row) => newString + row.word + "\n", "");
             let writeStream = fs.createWriteStream('./config/dictionary.txt');
             writeStream.write(dictString);
             writeStream.end();
