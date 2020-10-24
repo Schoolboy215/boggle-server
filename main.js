@@ -10,6 +10,9 @@ var ws = require('ws');
 var wsHandler = require('./websocketHandler');
 var fileUpload = require('express-fileupload');
 
+var config = require('./config');
+config.checkEnv();
+
 require('dotenv').config();
 require('./authenticate/init');
 
@@ -91,8 +94,6 @@ app.use("/bootstrap",express.static(__dirname + '/node_modules/bootstrap/dist'))
 app.use("/bootstrap-fileInput",express.static(__dirname + '/node_modules/bootstrap-fileinput/js'));
 app.use("/popper",express.static(__dirname + '/node_modules/popper.js/dist'));
 app.use("/jquery",express.static(__dirname + '/node_modules/jquery/dist'));
-
-var config = require('./config');
 
 // Routing
 var indexRouter = require('./routes/index');

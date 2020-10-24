@@ -1,3 +1,4 @@
+const { exception } = require('console');
 var fs = require('fs');
 
 const sqlite3 = require('sqlite3').verbose();
@@ -7,6 +8,29 @@ var inMemDB = null;
 var diskDB = null;
 var loaded = false;
 var apiToken = null;
+
+exports.checkEnv = function(){
+    const variablesToCheck = [
+        "SESSION_SECRET",
+        "CERT_PATH",
+        "KEY_PATH",
+        "PORT",
+        "GAME_LENGTH",
+        "ROOMCODE_BYTES"
+    ]
+    var error = false;
+    variablesToCheck.forEach(variable => {
+        if (!process.env[variable])
+        {
+            console.error("Missing .env variable " + variable);
+            error = true;
+        }
+    });
+    if (error)
+    {
+        throw new Error(".env file is not fully set up");
+    }
+}
 
 exports.init = function(){
     return new Promise( async (resolve,reject) => {
