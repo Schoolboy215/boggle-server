@@ -91,8 +91,7 @@ app.use(function(req, res, next){
 app.use(express.static(path.join(__dirname, 'public'), { dotfiles: 'allow' }));
 //Expose our node_module versions of js libraries
 app.use("/bootstrap",express.static(__dirname + '/node_modules/bootstrap/dist'));
-app.use("/bootstrap-fileInput",express.static(__dirname + '/node_modules/bootstrap-fileinput/js'));
-app.use("/popper",express.static(__dirname + '/node_modules/popper.js/dist'));
+app.use("/bootstrap-fileInput",express.static(__dirname + '/node_modules/bootstrap-fileinput/js'));;
 app.use("/jquery",express.static(__dirname + '/node_modules/jquery/dist'));
 
 // Routing
