@@ -25,6 +25,10 @@
         "data":
         {
             "type": "object"
+        },
+        "apiToken":
+        {
+            "type": "string"
         }
     },
     "required": [

@@ -1,12 +1,14 @@
 var crypto = require("crypto");
 const { connect } = require("http2");
-const { join } = require("path");
+const { join, parse } = require("path");
 var Board = require('../board/board');
 var Ajv = require('ajv');
 require('dotenv').config();
+var config = require("../config");
 
 var connections=[]
 var currentGames = {}
+var apiToken = "";
 var ajv = new Ajv({"allErrors":"true"});
 var schema = require('./wsSchema.json');
 
@@ -23,6 +25,7 @@ module.exports = class wsHandler {
         this.connections = [];
         this.currentGames = {};
         this.validate = ajv.compile(schema);
+        this.apiToken = config.getAPIToken();
     }
 
     handleConnection(socket) {
@@ -64,6 +67,20 @@ module.exports = class wsHandler {
                 return;
             }
             var messageType = parsedMessage['event'];
+            if (this.apiToken)
+            {
+                if (parsedMessage['apiToken'])
+                {
+                    if (parsedMessage['apiToken'] != this.apiToken)
+                    {
+                        throw new Error("Incorrect apiToken");
+                    }
+                }
+                else
+                {
+                    throw new Error("Missing apiToken");
+                }
+            }
         }
         catch(err)
         {
@@ -85,7 +102,6 @@ module.exports = class wsHandler {
                     {
                         socket.roomCode = crypto.randomBytes(parseInt(process.env.ROOMCODE_BYTES)).toString('hex');
                         socket.name = parsedData['name'];
-                        //socket.roomCode = "026f";
                         messageResponse.event = "roomCode";
                         messageResponse.data = socket.roomCode;
                     }
