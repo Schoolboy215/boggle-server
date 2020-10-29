@@ -10,7 +10,10 @@ var connections=[]
 var currentGames = {}
 var apiToken = "";
 var ajv = new Ajv({"allErrors":"true"});
-var schema = require('./wsSchema.json');
+var messageSchema = require('./schemas/message.json');
+var createRoomDataSchema = require('./schemas/createRoomData.json');
+var joinRoomDataSchema = require('./schemas/joinRoom.json')
+var foundWordsDataSchema = require('./schemas/foundWords.json')
 
 class clientResponse {
     constructor() {
@@ -24,7 +27,8 @@ module.exports = class wsHandler {
     constructor() {
         this.connections = [];
         this.currentGames = {};
-        this.validate = ajv.compile(schema);
+        this.validate = ajv.compile(messageSchema);
+        this.dataValidate = null;
         this.apiToken = config.getAPIToken();
     }
 
@@ -94,56 +98,86 @@ module.exports = class wsHandler {
             switch (messageType)
             {
                 case 'createRoom':
-                    if (socket.roomCode)
+                    this.dataValidate = ajv.compile(createRoomDataSchema);
+                    if (parsedData)
                     {
-                        createErrorMessage(messageResponse, "Connection already has room code");
+                        var validData = this.dataValidate(parsedMessage['data']);
+                        if (!validData)
+                        {
+                            createErrorMessage(messageResponse, this.dataValidate.errors);
+                            socket.send(JSON.stringify(messageResponse));
+                            break;
+                        }
+                        if (socket.roomCode)
+                        {
+                            createErrorMessage(messageResponse, "Connection already has room code");
+                        }
+                        else
+                        {
+                            socket.roomCode = crypto.randomBytes(parseInt(process.env.ROOMCODE_BYTES)).toString('hex');
+                            socket.name = parsedData['name'];
+                            messageResponse.event = "roomCode";
+                            messageResponse.data = socket.roomCode;
+                        }
                     }
                     else
                     {
-                        socket.roomCode = crypto.randomBytes(parseInt(process.env.ROOMCODE_BYTES)).toString('hex');
-                        socket.name = parsedData['name'];
-                        messageResponse.event = "roomCode";
-                        messageResponse.data = socket.roomCode;
+                        createErrorMessage(messageResponse, "This message type requires data");
                     }
                     socket.send(JSON.stringify(messageResponse));
                     break;
                 case 'joinRoom':
-                    if (socket.roomCode)
+                    this.dataValidate = ajv.compile(joinRoomDataSchema)
+                    if (parsedData)
                     {
-                        createErrorMessage(messageResponse, "Connection already in a room");
+                        var validData = this.dataValidate(parsedMessage['data']);
+                        if (!validData)
+                        {
+                            createErrorMessage(messageResponse, this.dataValidate.errors);
+                            socket.send(JSON.stringify(messageResponse));
+                            break;
+                        }
+                        if (socket.roomCode)
+                        {
+                            createErrorMessage(messageResponse, "Connection already in a room");
+                        }
+                        else
+                        {
+                            try{
+                                var roomToJoin = parsedData['roomCode'];
+                                socket.name = parsedData['name'];
+                            }
+                            catch(err)
+                            {
+                                createErrorMessage(messageResponse, err.message);
+                                socket.send(JSON.stringify(messageResponse));
+                                return;
+                            }
+                            for (const connection of this.connections)
+                            {
+                                if (connection.roomCode && connection.roomCode == roomToJoin && connection != socket)
+                                {
+                                    socket.roomCode = roomToJoin;
+                                    var joinResponse = new clientResponse();
+                                    joinResponse.event = "joinNotification";
+                                    joinResponse.data = socket.name + " joined your room";
+                                    connection.send(JSON.stringify(joinResponse));
+                                }
+                            }
+                            if (socket.roomCode)    //A connection with the matching code was found
+                            {
+                                messageResponse.event = "joinSuccess";
+                            }
+                            else                    //No match found. Send error
+                            {
+                                createErrorMessage(messageResponse, "Room code not found");
+                            }
+                            
+                        }
                     }
                     else
                     {
-                        try{
-                            var roomToJoin = parsedData['roomCode'];
-                            socket.name = parsedData['name'];
-                        }
-                        catch(err)
-                        {
-                            createErrorMessage(messageResponse, err.message);
-                            socket.send(JSON.stringify(messageResponse));
-                            return;
-                        }
-                        for (const connection of this.connections)
-                        {
-                            if (connection.roomCode && connection.roomCode == roomToJoin && connection != socket)
-                            {
-                                socket.roomCode = roomToJoin;
-                                var joinResponse = new clientResponse();
-                                joinResponse.event = "joinNotification";
-                                joinResponse.data = socket.name + " joined your room";
-                                connection.send(JSON.stringify(joinResponse));
-                            }
-                        }
-                        if (socket.roomCode)    //A connection with the matching code was found
-                        {
-                            messageResponse.event = "joinSuccess";
-                        }
-                        else                    //No match found. Send error
-                        {
-                            createErrorMessage(messageResponse, "Room code not found");
-                        }
-                        
+                        createErrorMessage(messageResponse, "This message type requires data");
                     }
                     socket.send(JSON.stringify(messageResponse));
                     break;
@@ -184,25 +218,40 @@ module.exports = class wsHandler {
                     }, process.env.GAME_LENGTH*1000);
                     break;
                 case 'foundWords':
-                    var roomBoard = this.currentGames[socket.roomCode];
-                    if (roomBoard.inProgress)
+                    this.dataValidate = ajv.compile(joinRoomDataSchema)
+                    if (parsedData)
                     {
-                        createErrorMessage(messageResponse, "Game still in progress");
-                        socket.send(JSON.stringify(messageResponse));
-                        break;
+                        var validData = this.dataValidate(parsedMessage['data']);
+                        if (!validData)
+                        {
+                            createErrorMessage(messageResponse, this.dataValidate.errors);
+                            socket.send(JSON.stringify(messageResponse));
+                            break;
+                        }
+                        var roomBoard = this.currentGames[socket.roomCode];
+                        if (roomBoard.inProgress)
+                        {
+                            createErrorMessage(messageResponse, "Game still in progress");
+                            socket.send(JSON.stringify(messageResponse));
+                            break;
+                        }
+                        roomBoard.responses[socket.id] = {};
+                        roomBoard.responses[socket.id].words = parsedData['words'];
+                        roomBoard.responses[socket.id].name = socket.name;
+                        if (Object.keys(roomBoard.responses).length == roomBoard.expectedResponseCount)
+                        {
+                            console.log("ALL RESPONSES RECEIVED FOR ROOM " + socket.roomCode);
+                            this.scoreResults(roomBoard);
+                            messageResponse.event = "gameResults";
+                            messageResponse.data = {};
+                            messageResponse.data["winners"] = roomBoard.winners;
+                            messageResponse.data["responses"] = roomBoard.responses;
+                            this.sendToWholeRoom(socket.roomCode, messageResponse);
+                        }
                     }
-                    roomBoard.responses[socket.id] = {};
-                    roomBoard.responses[socket.id].words = parsedData['words'];
-                    roomBoard.responses[socket.id].name = socket.name;
-                    if (Object.keys(roomBoard.responses).length == roomBoard.expectedResponseCount)
+                    else
                     {
-                        console.log("ALL RESPONSES RECEIVED FOR ROOM " + socket.roomCode);
-                        this.scoreResults(roomBoard);
-                        messageResponse.event = "gameResults";
-                        messageResponse.data = {};
-                        messageResponse.data["winners"] = roomBoard.winners;
-                        messageResponse.data["responses"] = roomBoard.responses;
-                        this.sendToWholeRoom(socket.roomCode, messageResponse);
+                        createErrorMessage(messageResponse, "This message type requires data");
                     }
                     break;
                 default:

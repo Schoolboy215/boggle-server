@@ -1,0 +1,17 @@
+{
+    "properties": {
+        "name":
+        {
+            "type": "string"
+        },
+        "roomCode":
+        {
+            "type": "string"
+        }
+    },
+    "required": [
+        "name",
+        "roomCode"
+    ],
+    "type":"object"
+}

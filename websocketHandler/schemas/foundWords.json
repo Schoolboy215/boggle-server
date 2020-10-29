@@ -1,0 +1,14 @@
+{
+    "properties": {
+        "words": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+        }
+    },
+    "required": [
+        "words"
+    ],
+    "type":"object"
+}
