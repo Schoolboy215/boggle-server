@@ -208,6 +208,7 @@ module.exports = class wsHandler {
                     b.inProgress = true;
                     b.responses = {};
                     b.expectedResponseCount = this.numberInRoom(socket.roomCode);
+                    b.duration = process.env.GAME_LENGTH
                     var startResponse = new clientResponse();
                     startResponse.event = "gameStart";
                     startResponse.data = b;
