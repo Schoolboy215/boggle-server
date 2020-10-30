@@ -13,7 +13,8 @@ var ajv = new Ajv({"allErrors":"true"});
 var messageSchema = require('./schemas/message.json');
 var createRoomDataSchema = require('./schemas/createRoomData.json');
 var joinRoomDataSchema = require('./schemas/joinRoom.json')
-var foundWordsDataSchema = require('./schemas/foundWords.json')
+var foundWordsDataSchema = require('./schemas/foundWords.json');
+const { data } = require("jquery");
 
 class clientResponse {
     constructor() {
@@ -160,7 +161,9 @@ module.exports = class wsHandler {
                                     socket.roomCode = roomToJoin;
                                     var joinResponse = new clientResponse();
                                     joinResponse.event = "joinNotification";
-                                    joinResponse.data = socket.name + " joined your room";
+                                    var dataObject = {}
+                                    dataObject["name"] = socket.name;
+                                    joinResponse.data = dataObject;
                                     connection.send(JSON.stringify(joinResponse));
                                 }
                             }

@@ -12,6 +12,7 @@
                 "createRoom",
                 "joinRoom",
                 "joinNotification",
+                "joinSuccess",
 
                 "startGame",
                 "gameEnd",
