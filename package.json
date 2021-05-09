@@ -19,13 +19,16 @@
     "express": "^4.16.3",
     "express-fileupload": "^1.2.0",
     "express-handlebars": "^3.1.0",
+    "handlebars": ">=4.7.7",
     "express-session": "^1.17.0",
     "jquery": "^3.5.1",
+    "lodash": ">=4.17.21",
     "node-sass-middleware": "^0.11.0",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "source": "0.0.3",
     "sqlite3": "^4.2.0",
-    "ws": "^7.3.1"
+    "ws": "^7.3.1",
+    "y18n": ">=3.2.2"
   }
 }
