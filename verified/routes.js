@@ -17,7 +17,8 @@ router.post('/processChanges', async function(req,res,next) {
 
 //Settings screen
 router.get('/settings', async function(req,res,next) {
-    res.render('settings');
+    var apiToken     = await config.getAPIToken();
+    res.render('settings', {apiToken: apiToken});
 });
 
 //Dictionary file related routes
@@ -37,6 +38,18 @@ router.post('/dictionaryUpload', async (req, res) => {
             req.flash("success_message", "Done");
             res.redirect('./settings');
         }
+    } catch (err) {
+        req.flash("error_message", err);
+        res.redirect('./settings');
+    }
+});
+
+//ApiToken related routes
+router.post('/apiToken', async (req, res) => {
+    try {
+        await config.setAPIToken(req.body["apiToken"]);
+        req.flash("success_message", "Done");
+        res.redirect('./settings');
     } catch (err) {
         req.flash("error_message", err);
         res.redirect('./settings');

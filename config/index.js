@@ -250,6 +250,13 @@ exports.processRequests = function(reqBody) {
 exports.getAPIToken = function() {
     return this.apiToken;
 }
+exports.setAPIToken = function(newToken){
+    return new Promise( async (resolve,reject) => {
+        fs.writeFileSync('.apiToken',newToken);
+        this.apiToken = newToken;
+        resolve();
+    });
+}
 exports.createNewDictFile = function(){
     return new Promise( async (resolve,reject) => {
         if (fs.existsSync('./config/dictionary.txt'))

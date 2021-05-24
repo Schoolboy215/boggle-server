@@ -15,4 +15,18 @@
         </div>
         <input id="dictInput" name="dictInput" type="file" class="file" data-show-preview="false">
     </div>
+</form>
+<form   ref='apiTokenForm'
+        id='apiTokenForm'
+        action='./apiToken'
+        method='post'
+        encType="multipart/form-data"
+        autocomplete="off">
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="uploadGroup">Api token</span>
+        </div>
+        <input id="apiToken" name="apiToken" type="text" value={{apiToken}}>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
 </form> 
