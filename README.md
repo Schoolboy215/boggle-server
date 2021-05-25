@@ -22,7 +22,7 @@ _notes:_
 * `CA` _is optional and points to a ` chain.pem ` file if you're using a certificate from an authority_
 
 ### .apiToken file ###
-If you want your server to be secured with an api token, you simply put the code into the `.apiToken` file
+If you want your server to be secured with an api token, you simply put the value into the `.apiToken` file. The token can also be changed later from the settings page of the interface after logging in. **If you use a token, users who wish to make requests to the server either by API or with a mobile app will need to be told so they can enter it**
 
 #### Setting up for certbot ####
 If you're using the guide linked above and need to validate your domain, you can run the ` certSetup.js ` server temporarily.
@@ -32,4 +32,9 @@ After the server is up and running, you can navigate to the root and go to the l
 Note that there can only be one account for security reasons so you'll need to log in with that original account later. Right now the only option if you forget the password is to manually open the users.sqlite database and delete your record.
 
 
-When logged in, the only real page you care about is "Change requests". The interface there is two lists of words that users have requested you either add or remove from the database that generates puzzles. Simply check the box next to any change you agree with, ignoring those you don't. When you are done, click "Process" at the bottom and all changes are committed. **Note that after clicking the button, all requests are deleted so you need to process the whole list in one go or risk losing information**
+When logged in, the main page you care about is "Change requests". The interface there is two lists of words that users have requested you either add or remove from the database that generates puzzles. Simply check the box next to any change you agree with, ignoring those you don't. When you are done, click "Process" at the bottom and all changes are committed. **Note that after clicking the button, all requests are deleted so you need to process the whole list in one go or risk losing information**.
+
+Aside from the changes page there is also a settings page that allows you to:
+* Download a copy of the current dictionary in .txt format
+* Upload a .txt file to replace the current dictionary (one word per line)
+* View/change the current API token. Pressing the save button while the field is blank will clear the settings so that there is no longer a token at all
