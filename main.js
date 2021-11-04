@@ -100,12 +100,14 @@ var boardRouter = require('./board/routes');
 var configRouter = require('./config/routes');
 var authRouter = require('./authenticate/routes');
 var verifiedRouter = require('./verified/routes');
+var definitionRouter = require('./definitionAPI/routes');
 
 app.use('/', indexRouter);
 app.use('/auth', authRouter);
 app.use('/api/boards', verifiedRouter.checkAPIToken, boardRouter);
 app.use('/api/words', verifiedRouter.checkAPIToken, configRouter);
 app.use('/verified', verifiedRouter.ensureAuthenticated, verifiedRouter.router);
+app.use('/api/definitions', verifiedRouter.checkAPIToken, definitionRouter);
 
 try{
     config.init().then((result) => {
