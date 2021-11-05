@@ -17,48 +17,48 @@ const cubes = [
     ['H','L','N','N','R','Z']
 ]
 
-var config = require("../config");
+var config = require("../config")
 var stack = []
 
 function findNeighbors(spot){
-    var neighbors = new Array();
+    var neighbors = new Array()
     if (spot%4){
-        neighbors.push(spot-1);     //LEFT
+        neighbors.push(spot-1)     //LEFT
         if (spot>3)
-            neighbors.push(spot-5); //ABOVE LEFT
+            neighbors.push(spot-5) //ABOVE LEFT
         if (spot<12)
-            neighbors.push(spot+3); //BELOW LEFT
+            neighbors.push(spot+3) //BELOW LEFT
     }
     if (spot>3)
-        neighbors.push(spot-4);     //ABOVE CENTER
+        neighbors.push(spot-4)     //ABOVE CENTER
     if (spot==0 || (spot+1) % 4) {
-        neighbors.push(spot+1);     //RIGHT
+        neighbors.push(spot+1)     //RIGHT
         if (spot>3)
-            neighbors.push(spot-3); //ABOVE RIGHT
+            neighbors.push(spot-3) //ABOVE RIGHT
         if (spot<12)
-            neighbors.push(spot+5); //BELOW RIGHT
+            neighbors.push(spot+5) //BELOW RIGHT
     }
     if (spot < 12)
-        neighbors.push(spot+4);     //BELOW CENTER
-    neighbors = neighbors.sort();
-    return neighbors;
+        neighbors.push(spot+4)     //BELOW CENTER
+    neighbors = neighbors.sort()
+    return neighbors
 }
 module.exports = class Board {
     constructor() {
-        this.squares = [];
-        this.words = [];
+        this.squares    = []
+        this.words      = []
     }
 
     fillSquares() {
-        var used = new Array(16);
-        var filled = 0;
+        var used = new Array(16)
+        var filled = 0
         while (filled < 16) {
-            var spot = Math.floor(Math.random() * 16);
+            var spot = Math.floor(Math.random() * 16)
             while (used[spot])
-                spot = Math.floor(Math.random() * 16);
+                spot = Math.floor(Math.random() * 16)
             this.squares[filled] = cubes[spot][Math.floor(Math.random() * 6)]
-            used[spot] = true;
-            filled++;
+            used[spot] = true
+            filled++
         }
     }
 
@@ -68,54 +68,51 @@ module.exports = class Board {
             {
                 for (var x = 0; x < 4; x++)
                 {
-                    var spot = y*4 + x;
-                    await this.solveSpot(spot, [], this.squares[spot]);
+                    var spot = y*4 + x
+                    await this.solveSpot(spot, [], this.squares[spot])
                 }
             }
-            this.words = this.words.sort();
-            resolve();
-        });
+            this.words = this.words.sort()
+            resolve()
+        })
     }
 
     solveSpot(_spot, _used, _soFar) {
-        var spot    = _spot;
-        var used    = [..._used];
-        var soFar   = _soFar;
+        var spot    = _spot
+        var used    = [..._used]
+        var soFar   = _soFar
 
-        used.push(spot);
+        used.push(spot)
         return new Promise( async (resolve,reject) => {
-            var neighbors = findNeighbors(spot);
+            var neighbors = findNeighbors(spot)
             for (var i = 0; i < neighbors.length; i++)
             {
-                var s = neighbors[i];
+                var s = neighbors[i]
                 if (!used.includes(s))
                 {
-                    var building = (soFar + this.squares[s]).toLowerCase();
-                    var words = await this.checkWord(building);
+                    var building = (soFar + this.squares[s]).toLowerCase()
+                    var words = await this.checkWord(building)
                     if (words.length)
                     {
                         if (words.includes(building) && !this.words.includes(building))
                         {
-                            this.words.push(building);
+                            this.words.push(building)
                         }
-                        await this.solveSpot(s, used, building);
+                        await this.solveSpot(s, used, building)
                     }
                 }
             }
-            resolve();
-        });
+            resolve()
+        })
     }
 
-    checkWord(word) {
-        return new Promise((resolve,reject) => {
-            config.findWord(word).then(words => {
-                resolve(words);
-            });
-        });
+    async checkWord(word) {
+        return new Promise(async (resolve,reject) => {
+            resolve(await config.findWord(word))
+        })
     }
-
 
     boardToJSON() {
-        return JSON.stringify(this.squares);
+        return JSON.stringify(this.squares)
     }
 }

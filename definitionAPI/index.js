@@ -5,7 +5,7 @@ exports.getWordDefinition = function(word){
         var definitionResult        = {}
         definitionResult['word']    = word
         try {
-            const response                  = await got('https://api.dictionaryapi.dev/api/v2/entries/en/' + word);
+            const response                  = await got('https://api.dictionaryapi.dev/api/v2/entries/en/' + word)
             const parsedReponse             = JSON.parse(response.body)
 
             definitionResult['definition']  = parsedReponse[0].meanings[0].definitions[0].definition

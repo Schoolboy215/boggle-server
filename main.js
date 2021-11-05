@@ -1,130 +1,162 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-var hbs = require('express-handlebars');
-var sassMiddleware  = require('node-sass-middleware');
-var path = require('path');
-var passport = require('passport');
-var session = require('express-session');
-var flash = require('connect-flash');
-var ws = require('ws');
-var wsHandler = require('./websocketHandler');
-var fileUpload = require('express-fileupload');
+// Load modules
+var express         = require('express')
+var hbs             = require('express-handlebars')
+var sassMiddleware  = require('node-sass-middleware')
+var path            = require('path')
+var passport        = require('passport')
+var session         = require('express-session')
+var flash           = require('connect-flash')
+var ws              = require('ws')
+var fileUpload      = require('express-fileupload')
+const sqlite3       = require('sqlite3').verbose()
 
-var config = require('./config');
-config.checkEnv();
+// Load custom objects here
+var wsHandler       = require('./websocketHandler')
+var config          = require('./config')
+var auth            = require('./authenticate')
 
-require('dotenv').config();
-require('./authenticate/init');
+// Set up our .env configuration
+config.checkEnv()
+require('dotenv').config()
 
 //Get server keys for SSL
-var https = require('https')
-const fs = require('fs');
-const key = fs.readFileSync(process.env.KEY_PATH);
-const cert = fs.readFileSync(process.env.CERT_PATH);
+var https       = require('https')
+const fs        = require('fs')
+const key       = fs.readFileSync(process.env.KEY_PATH)
+const cert      = fs.readFileSync(process.env.CERT_PATH)
 var credentials = {}
 
+// If the certificate is real and signed by a certificate authority we need to set the credentials to include that
 if (process.env.CAPath)
 {
-    const ca = fs.readFileSync(process.env.CA_PATH);
+    const ca = fs.readFileSync(process.env.CA_PATH)
     credentials = {
-        key: key,
-        cert: cert,
-        ca: ca
-    };
+        key:    key,
+        cert:   cert,
+        ca:     ca
+    }
 }
+// No CA (probably some self-signed thing)
 else
 {
     credentials = {
-        key: key,
-        cert: cert,
-    };
+        key:    key,
+        cert:   cert,
+    }
 }
 
-
-
-const sqlite3 = require('sqlite3').verbose();
-
-var app = express();
+// Start getting routing and other site stuff running
+var app = express()
 
 // enable files upload
 app.use(fileUpload({
     createParentPath: true
-}));
+}))
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+// get routing started
+app.use(express.json())
+app.use(express.urlencoded({extended:true}))
 
+// Set up SASS stuff
 app.use('/stylesheets',sassMiddleware({
-    /* Options */
-    src: __dirname + '/sass',
-    dest: __dirname + '/public/stylesheets',
-    debug: true,
-    outputStyle: 'expanded'
-}));
+    src:            __dirname + '/sass',
+    dest:           __dirname + '/public/stylesheets',
+    debug:          true,
+    outputStyle:    'expanded'
+}))
   
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
+// View engine setup
+app.set('views', path.join(__dirname, 'views'))
 app.engine('hbs', hbs({ 
-    extname: 'hbs', 
-    defaultLayout: 'main',
-    layoutsDir: __dirname + '/views/layouts/',
-    partialsDir: __dirname + '/views/partials/'
-}));
-app.set('view engine', 'hbs');
+    extname:        'hbs', 
+    defaultLayout:  'main',
+    layoutsDir:     __dirname + '/views/layouts/',
+    partialsDir:    __dirname + '/views/partials/'
+}))
+app.set('view engine', 'hbs')
 
+// Get session secret set up
 app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: true,
-    saveUninitialized: true,
-    cookie: { secure: true }
-}));
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(flash());
+    secret:             process.env.SESSION_SECRET,
+    resave:             true,
+    saveUninitialized:  true,
+    cookie:             { secure: true }
+}))
+
+// Hook our authentication up to the site
+app.use(passport.initialize())
+app.use(passport.session())
+app.use(flash())
+
+// Make sure that all requests run through and keep track of the user
 app.use(function(req, res, next){
-    res.locals.success_message = req.flash('success_message');
-    res.locals.error_message = req.flash('error_message');
-    res.locals.user = req.user;
-    next();
-});
+    res.locals.success_message  = req.flash('success_message')
+    res.locals.error_message    = req.flash('error_message')
+    res.locals.user             = req.user
+    next()
+})
 
-app.use(express.static(path.join(__dirname, 'public'), { dotfiles: 'allow' }));
+// Ensure that public things like stylesheets are available
+app.use(express.static(path.join(__dirname, 'public'), { dotfiles: 'allow' }))
+
 //Expose our node_module versions of js libraries
-app.use("/bootstrap",express.static(__dirname + '/node_modules/bootstrap/dist'));
-app.use("/bootstrap-fileInput",express.static(__dirname + '/node_modules/bootstrap-fileinput/js'));;
-app.use("/jquery",express.static(__dirname + '/node_modules/jquery/dist'));
+app.use("/bootstrap",express.static(__dirname + '/node_modules/bootstrap/dist'))
+app.use("/bootstrap-fileInput",express.static(__dirname + '/node_modules/bootstrap-fileinput/js'))
+app.use("/jquery",express.static(__dirname + '/node_modules/jquery/dist'))
 
-// Routing
-var indexRouter = require('./routes/index');
-var boardRouter = require('./board/routes');
-var configRouter = require('./config/routes');
-var authRouter = require('./authenticate/routes');
-var verifiedRouter = require('./verified/routes');
-var definitionRouter = require('./definitionAPI/routes');
+// Routing setup that we call after authorization has been initialized
+loadRoutes = function()
+{
+    var indexRouter         = require('./routes/index')
+    var boardRouter         = require('./board/routes')
+    var configRouter        = require('./config/routes')
+    var authRouter          = require('./authenticate/routes')
+    var verifiedRouter      = require('./verified/routes')
+    var definitionRouter    = require('./definitionAPI/routes')
 
-app.use('/', indexRouter);
-app.use('/auth', authRouter);
-app.use('/api/boards', verifiedRouter.checkAPIToken, boardRouter);
-app.use('/api/words', verifiedRouter.checkAPIToken, configRouter);
-app.use('/verified', verifiedRouter.ensureAuthenticated, verifiedRouter.router);
-app.use('/api/definitions', verifiedRouter.checkAPIToken, definitionRouter);
+    app.use('/',                indexRouter)
+    app.use('/auth',            authRouter)
+    app.use('/api/boards',      verifiedRouter.checkAPIToken, boardRouter)
+    app.use('/api/words',       verifiedRouter.checkAPIToken, configRouter)
+    app.use('/verified',        verifiedRouter.ensureAuthenticated, verifiedRouter.router)
+    app.use('/api/definitions', verifiedRouter.checkAPIToken, definitionRouter)
+}
 
-try{
-    config.init().then((result) => {
-        console.log(result);
+// This is the start method that we will call next
+const startServer = async function()
+{
+    try
+    {
+        // Initialize authentication stuff
+        await auth.init()
 
-        const server = https.createServer(credentials, app);
+        loadRoutes()
+
+        await config.init().catch( (reason) => {
+            console.error(reason)
+        })
+
+        // Start the regular server
+        const server = https.createServer(credentials, app)
         server.listen(process.env.PORT, function () {
             console.log('listening on port ' + process.env.PORT.toString())
-        });
+        })
 
-        const wss = new ws.Server({ server });
-        var handler = new wsHandler.wsHandler();
+        // Start the websocket server
+        const wss = new ws.Server({ server })
+
+        // This is our custom handler. See that module for details
+        var handler = new wsHandler.wsHandler()
         wss.on('connection', (socket) => {
-            handler.handleConnection(socket);
-        });
-    });
-} catch(e) {
-    console.error(e);
-    return;
+            handler.handleConnection(socket)
+        })
+    }
+    catch(e)
+    {
+        console.error(e)
+        return
+    }
 }
+
+// Time to actually start things
+startServer()

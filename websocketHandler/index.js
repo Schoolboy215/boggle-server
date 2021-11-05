@@ -1,4 +1,4 @@
-var wsHandler = require('./wsHandler');
+var wsHandler = require('./wsHandler')
 
 module.exports = {
     wsHandler: wsHandler
