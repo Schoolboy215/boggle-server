@@ -152,7 +152,7 @@ async function createDictFromFile(){
                 db.run("BEGIN TRANSACTION")
                 wordsToInsert.forEach((word) => {
                     db.serialize(function() {
-                        db.run("INSERT INTO words(word) VALUES('?')",[word])
+                        db.run("INSERT INTO words(word) VALUES(?)",[word])
                     })
                 })
                 db.run("COMMIT")
