@@ -20,7 +20,7 @@ router.get("/create", async (req,res) => {
 router.get("/create/:quantity", async (req,res) => {
     var boards = []
 
-    if (req.params.quantity > process.env.MAX_MULTIBOARD_GEN)
+    if (parseInt(req.params.quantity) > parseInt(process.env.MAX_MULTIBOARD_GEN))
     {
         res.status(400).send("Multi-board request exceeds server maximum of " + process.env.MAX_MULTIBOARD_GEN)
     }
