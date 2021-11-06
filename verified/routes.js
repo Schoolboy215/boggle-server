@@ -56,6 +56,28 @@ router.post('/apiToken', async (req, res) => {
     }
 })
 
+// Stat-related routes
+router.post('/resetStats', async (req, res) => {
+    try {
+        await config.resetStats()
+        req.flash("success_message", "Done")
+
+        if (req.wsHandler)
+        {
+            // If the request has a websocket handler, we can clear out everyone's home page that is watching
+            if (req.wsHandler)
+            {
+                // No need to await this call. The person who cleared the stats is already on a different page
+                req.wsHandler.updateHomePage()
+            }
+        }
+        res.redirect('./settings')
+    } catch (err) {
+        req.flash("error_message", err)
+        res.redirect('./settings')
+    }
+})
+
 function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated())
         return next()

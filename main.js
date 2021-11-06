@@ -150,6 +150,11 @@ const startServer = async function()
         wss.on('connection', (socket) => {
             handler.handleConnection(socket)
         })
+        
+        // We use this event to attach our websocket handler to any incoming request in case they need to push out messages
+        server.on('request', (req) => {
+            req.wsHandler = handler
+        })
     }
     catch(e)
     {

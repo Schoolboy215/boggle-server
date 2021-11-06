@@ -73,7 +73,9 @@ module.exports = class Board {
                 }
             }
             this.words = this.words.sort()
-            resolve()
+            config.diskDB.run("INSERT INTO boardHistory(timestamp) VALUES(CURRENT_TIMESTAMP)", err => {
+                resolve()
+            })
         })
     }
 

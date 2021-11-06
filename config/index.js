@@ -140,6 +140,7 @@ async function createDictFromFile(){
                 db.run('CREATE UNIQUE INDEX wordIdx ON words(word)')
                 db.run('CREATE TABLE if not exists addWords(word text)')
                 db.run('CREATE TABLE if not exists removeWords(word text)')
+                db.run('CREATE TABLE if not exists boardHistory(timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)')
                 db.run('DELETE FROM words')
             })
 
@@ -414,6 +415,38 @@ exports.importDictFile = function(file){
         writeStream.end()
         writeStream.on('finish', () => {
             resolve()
+        })
+    })
+}
+
+exports.resetStats = async function()
+{
+    return new Promise (async resolve => {
+        this.diskDB.run("DELETE FROM boardHistory", err => {
+            resolve()
+        })
+    })
+}
+
+exports.getBoardHistory = async function()
+{
+    return new Promise( async (resolve,reject) => {
+        this.diskDB.get('SELECT timestamp, ROWID FROM boardHistory ORDER BY ROWID DESC LIMIT 1', (err,row) => {
+            if (err)
+            {
+                reject(err)
+            }
+            else
+            {
+                if (row)
+                {
+                    resolve([row['rowid'],row['timestamp']])
+                }
+                else
+                {
+                    resolve([0,0])
+                }
+            }
         })
     })
 }

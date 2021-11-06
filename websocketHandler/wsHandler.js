@@ -72,7 +72,7 @@ module.exports = class wsHandler {
                 return
             }
             var messageType = parsedMessage['event']
-            if (this.apiToken)
+            if (this.apiToken && messageType != 'boardHistory')
             {
                 if (parsedMessage['apiToken'])
                 {
@@ -258,6 +258,13 @@ module.exports = class wsHandler {
                         createErrorMessage(messageResponse, "This message type requires data")
                     }
                     break
+                case 'boardHistoryCount':
+                    if (!socket.roomCode)
+                    {
+                        socket.roomCode = 'homePage'
+                    }
+                    socket.send(JSON.stringify(await this.getFreshHistory()))
+                    break
                 default:
                     createErrorMessage(messageResponse, "Message type not recognized")
                     socket.send(JSON.stringify(messageResponse))
@@ -270,7 +277,43 @@ module.exports = class wsHandler {
         }
     }
 
-    sendToWholeRoom(roomCode, message) {
+    async getFreshHistory()
+    {
+        return new Promise(async resolve =>
+        {
+            var messageResponse = new clientResponse()
+
+            messageResponse.event               = "boardHistoryCount"
+            messageResponse.data                = {}
+            messageResponse.data["history"]     = await config.getBoardHistory()
+            messageResponse.status              = "ok"
+
+            resolve(messageResponse)
+        })
+    }
+
+    async updateHomePage()
+    {
+        return new Promise (async resolve => {
+            var connectionsAtMainPage   = false
+            for (const connection of this.connections)
+            {
+                if (connection.roomCode && connection.roomCode == 'homePage')
+                {
+                    connectionsAtMainPage = true
+                    break;
+                }
+            }
+
+            if (connectionsAtMainPage)
+            {
+                await this.sendToWholeRoom('homePage', await this.getFreshHistory())
+                resolve()
+            }
+        })
+    }
+
+    async sendToWholeRoom(roomCode, message) {
         return new Promise( async (resolve, reject) => {
             var receiptTarget   = 0
             var sent            = 0

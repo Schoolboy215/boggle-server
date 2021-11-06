@@ -1,5 +1,15 @@
 <h1 class="display-4">Boggle</h1>
 <p class="lead">This is the user interface for managing your boggle server.</p>
 <hr>
-
 <p>The main function of this interface is to approve/deny changes to the dictionary that have been requested by users. Changes made here are effective as soon as approved and will be incorporated into new puzzles immediately.</p>
+<hr>
+<div class="card" style="width: 18rem;">
+    <div class="card-body">
+        <h5 class="card-title">Stats (realtime)</h5>
+        <h6 class="card-subtitle mb-2 text-muted">Total boards generated</h6>
+        <p class="card-text" id="gameCounter">-</p>
+        <h6 class="card-subtitle mb-2 text-muted">Last board timestamp</h6>
+        <p class="card-text" id="timeSinceLast">-</p>
+    </div>
+</div>
+<script src="gameHistorySocket.js"></script>
