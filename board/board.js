@@ -113,8 +113,4 @@ module.exports = class Board {
             resolve(await config.findWord(word))
         })
     }
-
-    boardToJSON() {
-        return JSON.stringify(this.squares)
-    }
 }

@@ -20,7 +20,8 @@ exports.checkEnv = function(){
         "KEY_PATH",
         "PORT",
         "GAME_LENGTH",
-        "ROOMCODE_BYTES"
+        "ROOMCODE_BYTES",
+        "MAX_MULTIBOARD_GEN"
     ]
     var error = false
     // Check each one to see if it's populated
