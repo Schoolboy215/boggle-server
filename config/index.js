@@ -138,7 +138,7 @@ async function createDictFromFile(){
             })
             db.serialize(function() {
                 db.run('CREATE TABLE if not exists words(word text)')
-                db.run('CREATE UNIQUE INDEX wordIdx ON words(word)')
+                db.run('CREATE UNIQUE INDEX if not exists wordIdx ON words(word)')
                 db.run('CREATE TABLE if not exists addWords(word text)')
                 db.run('CREATE TABLE if not exists removeWords(word text)')
                 db.run('CREATE TABLE if not exists boardHistory(timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)')
