@@ -12,4 +12,9 @@
         <p class="card-text" id="timeSinceLast">-</p>
     </div>
 </div>
+<hr>
+<p>This link will download the latest release of the accompanying android app</p>
+{{#if latest_download_url}}
+    <a class="btn btn-primary" href={{latest_download_url}}>DOWNLOAD ANDROID .APK</a>
+{{/if}}
 <script src="gameHistorySocket.js"></script>
