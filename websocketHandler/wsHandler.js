@@ -34,8 +34,8 @@ module.exports = class wsHandler {
     }
 
     handleConnection(socket) {
-        socket.send("Connection accepted. You are client " + this.connections.length)
         socket.id = crypto.randomBytes(8).toString('hex')
+        socket.send(socket.id)
         this.connections.push(socket)
 
         socket.on('close', (reasonCode, description) => {
