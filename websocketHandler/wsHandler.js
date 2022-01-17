@@ -222,7 +222,7 @@ module.exports = class wsHandler {
                     }, process.env.GAME_LENGTH*1000)
                     break
                 case 'foundWords':
-                    this.dataValidate       = ajv.compile(joinRoomDataSchema)
+                    this.dataValidate       = ajv.compile(foundWordsDataSchema)
                     if (parsedData)
                     {
                         var validData       = this.dataValidate(parsedMessage['data'])
