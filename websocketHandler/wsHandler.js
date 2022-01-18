@@ -246,10 +246,11 @@ module.exports = class wsHandler {
                         {
                             console.log("ALL RESPONSES RECEIVED FOR ROOM " + socket.roomCode)
                             this.scoreResults(roomBoard)
-                            messageResponse.event               = "gameResults"
-                            messageResponse.data                = {}
-                            messageResponse.data["winners"]     = roomBoard.winners
-                            messageResponse.data["responses"]   = roomBoard.responses
+                            messageResponse.event                   = "gameResults"
+                            messageResponse.data                    = {}
+                            messageResponse.data["winners"]         = roomBoard.winners
+                            messageResponse.data["unfoundWords"]    = roomBoard.unfoundWords;
+                            messageResponse.data["responses"]       = roomBoard.responses
                             this.sendToWholeRoom(socket.roomCode, messageResponse)
                         }
                     }
@@ -343,6 +344,9 @@ module.exports = class wsHandler {
     scoreResults(board)
     {
         var highestScore = 0
+        board.unfoundWords = []
+        board.unfoundWords = board.words.map((x) => x)
+
         for (var key in board.responses)
         {
             var response            = board.responses[key]
@@ -401,6 +405,13 @@ module.exports = class wsHandler {
             if (response.score == highestScore)
             {
                 board.winners.push(key)
+            }
+            for (var word in board.responses[key].words)
+            {
+                if (board.unfoundWords.includes(board.responses[key].words[word]))
+                {
+                    board.unfoundWords.splice(board.unfoundWords.indexOf(board.responses[key].words[word]),1)
+                }
             }
         }
     }
