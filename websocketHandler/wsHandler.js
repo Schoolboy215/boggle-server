@@ -240,7 +240,7 @@ module.exports = class wsHandler {
                             break
                         }
                         roomBoard.responses[socket.id]          = {}
-                        roomBoard.responses[socket.id].words    = parsedData['words']
+                        roomBoard.responses[socket.id].words    = parsedData['words'].map((x) => x.toUpperCase())
                         roomBoard.responses[socket.id].name     = socket.name
                         if (Object.keys(roomBoard.responses).length == roomBoard.expectedResponseCount)
                         {
@@ -345,7 +345,7 @@ module.exports = class wsHandler {
     {
         var highestScore = 0
         board.unfoundWords = []
-        board.unfoundWords = board.words.map((x) => x)
+        board.unfoundWords = board.words.map((x) => x.toUpperCase())
 
         for (var key in board.responses)
         {
