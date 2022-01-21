@@ -240,7 +240,7 @@ module.exports = class wsHandler {
                             break
                         }
                         roomBoard.responses[socket.id]          = {}
-                        roomBoard.responses[socket.id].words    = parsedData['words'].map((x) => x.toUpperCase())
+                        roomBoard.responses[socket.id].words    = parsedData['words'].sort().map((x) => x.toUpperCase())
                         roomBoard.responses[socket.id].name     = socket.name
                         if (Object.keys(roomBoard.responses).length == roomBoard.expectedResponseCount)
                         {
