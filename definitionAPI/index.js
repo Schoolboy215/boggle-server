@@ -3,12 +3,21 @@ var config = require("../config")
 
 exports.getWordDefinition = function(word) {
     return new Promise(async resolve => {
+        // Check if we have a merriam webster API key. Use it if so
         if (process.env["MERRIAM_WEBSTER_API_KEY"]) {
             var definitionResult = {}
             definitionResult['word'] = word
             try {
                 const response = await got('https://www.dictionaryapi.com/api/v3/references/collegiate/json/' + word + '?key=' + process.env["MERRIAM_WEBSTER_API_KEY"])
-                const parsedResponse = JSON.parse(response.body)
+                var parsedResponse
+                try{
+                    parsedResponse = JSON.parse(response.body)
+                }
+                catch (err) {
+                    definitionResult['error'] = response.body
+                    resolve(definitionResult)
+                    return
+                }
                 var shortDefs = parsedResponse[0].shortdef
                 definitionResult['definition'] = ''
 

@@ -24,12 +24,12 @@
         autocomplete="off">
     <div class="input-group mb-3">
         <div class="input-group-prepend">
-            <span class="input-group-text" id="uploadGroup">Api token</span>
+            <span class="input-group-text" id="apiToken">Api token</span>
         </div>
         <input id="apiToken" name="apiToken" type="text" value={{apiToken}}>
         <button type="submit" class="btn btn-primary">Save</button>
     </div>
-</form> 
+</form>
 <form   ref='statsForm'
         id='statsForm'
         action='./resetStats'
@@ -40,3 +40,19 @@
         <button type="submit" class="btn btn-primary">Reset stats</button>
     </div>
 </form> 
+<form   ref='envVariablesForm'
+        id='envVariablesForm'
+        action='./envVariables'
+        method='post'
+        encType="multipart/form-data"
+        autocomplete="off">
+{{#each variables}}
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="inputLabel">{{this.name}}</span>
+        </div>
+        <input class="envInput" id="{{this.name}}" name="{{this.name}}" type="text" value={{this.value}}>
+    </div>
+{{/each}}
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
