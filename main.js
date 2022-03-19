@@ -19,29 +19,42 @@ var auth            = require('./authenticate')
 config.checkEnv()
 require('dotenv').config()
 
-//Get server keys for SSL
 var https       = require('https')
+var http        = require('http')
 const fs        = require('fs')
-const key       = fs.readFileSync(process.env.KEY_PATH)
-const cert      = fs.readFileSync(process.env.CERT_PATH)
-var credentials = {}
-
 // If the certificate is real and signed by a certificate authority we need to set the credentials to include that
 if (process.env.CAPath)
+//Get server keys for SSL
+var key
+var cert
+var credentials
+if (process.env.SKIP_TLS == 0)
 {
-    const ca = fs.readFileSync(process.env.CA_PATH)
-    credentials = {
-        key:    key,
-        cert:   cert,
-        ca:     ca
-    }
+    key       = fs.readFileSync(process.env.KEY_PATH)
+    cert      = fs.readFileSync(process.env.CERT_PATH)
+    credentials = {}
 }
-// No CA (probably some self-signed thing)
-else
+
+// Only load certificate info if we're not skipping TLS
+if (process.env.SKIP_TLS == 0)
 {
-    credentials = {
-        key:    key,
-        cert:   cert,
+    // If the certificate is real and signed by a certificate authority we need to set the credentials to include that
+    if (process.env.CAPath)
+    {
+        const ca = fs.readFileSync(process.env.CA_PATH)
+        credentials = {
+            key:    key,
+            cert:   cert,
+            ca:     ca
+        }
+    }
+    // No CA (probably some self-signed thing)
+    else
+    {
+        credentials = {
+            key:    key,
+            cert:   cert,
+        }
     }
 }
 
@@ -137,7 +150,16 @@ const startServer = async function()
         })
 
         // Start the regular server
-        const server = https.createServer(credentials, app)
+        var server;
+        if (process.env.SKIP_TLS == 1)
+        {
+            server = http.createServer(app)
+        }
+        else
+        {
+            server = https.createServer(credentials, app)
+        }
+        
         server.listen(process.env.PORT, function () {
             console.log('listening on port ' + process.env.PORT.toString())
         })

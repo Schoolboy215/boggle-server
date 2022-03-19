@@ -15,6 +15,7 @@ var apiToken    = null
 exports.checkEnv = function(){
     // Set up the list of variables that are mandatory
     const variablesToCheck = [
+        "SKIP_TLS",
         "SESSION_SECRET",
         "CERT_PATH",
         "KEY_PATH",
@@ -28,8 +29,12 @@ exports.checkEnv = function(){
     variablesToCheck.forEach(variable => {
         if (!process.env[variable])
         {
-            console.error("Missing .env variable " + variable)
-            error = true
+            // Don't throw certificate errors if we are skipping TLS
+            if (process.env["SKIP_TLS"] == 0 && variable != "CERT_PATH" && variable != "KEY_PATH")
+            {
+                console.error("Missing .env variable " + variable)
+                error = true
+            }
         }
     })
     if (error)
