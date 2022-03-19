@@ -22,8 +22,6 @@ require('dotenv').config()
 var https       = require('https')
 var http        = require('http')
 const fs        = require('fs')
-// If the certificate is real and signed by a certificate authority we need to set the credentials to include that
-if (process.env.CAPath)
 //Get server keys for SSL
 var key
 var cert
