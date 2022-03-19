@@ -3,8 +3,12 @@
 
 //Overrides here
 $theme-colors: (
-  "primary": $cyan,
-  "secondary": $teal
+    "primary":      $cyan,
+    "secondary":    $teal
 );
+.envInput {
+    width: 100%
+}
+
 @import "../node_modules/bootstrap/scss/bootstrap";
 @import "../node_modules/bootstrap-fileinput/scss/fileinput";

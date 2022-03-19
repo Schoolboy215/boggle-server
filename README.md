@@ -15,11 +15,19 @@ KEY_PATH="/path/to/key.pem"
 PORT=443
 GAME_LENGTH=180
 ROOMCODE_BYTES=2
+MAX_MULTIBOARD_GEN=10
 ```
 _notes:_
 * `GAME_LENGTH` _is the number of seconds for multiplayer games only. Single player length is set on the client side_
 * `ROOMCODE_BYTES` _is effectively half the length of a final hex code for a room. So two bytes will turn into a four-character code_
 * `CA` _is optional and points to a ` chain.pem ` file if you're using a certificate from an authority_
+* `MAX_MUTLIBARD_GEN` _caps the number of boards that a client can generate in a single request
+
+### Word definition API ###
+The server is able to fetch definitions of words as requested by users. The default source is "Free Dictionary API" (https://dictionaryapi.dev/), but support has been added for Merriam Webster. Performance is much better, but registration for an API key is required and usage is capped. To register for an API key, visit https://dictionaryapi.com/register/index. Request "Collegiate Dictionary" access when choosing the kind of key to receive. After getting a key, add it to your .env file or log into the frontend and enter it on the settings page. Presence of a key in the .env file will cause the definition method to automatically switch from the default .env example:
+```env
+MERRIAM_WEBSTER_API_KEY=[your api key]
+```
 
 ### .apiToken file ###
 If you want your server to be secured with an api token, you simply put the value into the `.apiToken` file. The token can also be changed later from the settings page of the interface after logging in. **If you use a token, users who wish to make requests to the server either by API or with a mobile app will need to be told so they can enter it**
@@ -38,3 +46,4 @@ Aside from the changes page there is also a settings page that allows you to:
 * Download a copy of the current dictionary in .txt format
 * Upload a .txt file to replace the current dictionary (one word per line)
 * View/change the current API token. Pressing the save button while the field is blank will clear the settings so that there is no longer a token at all
+* Control a subset of the .env variables

@@ -34,8 +34,8 @@ module.exports = class wsHandler {
     }
 
     handleConnection(socket) {
-        socket.send("Connection accepted. You are client " + this.connections.length)
         socket.id = crypto.randomBytes(8).toString('hex')
+        socket.send(socket.id)
         this.connections.push(socket)
 
         socket.on('close', (reasonCode, description) => {
@@ -222,7 +222,7 @@ module.exports = class wsHandler {
                     }, process.env.GAME_LENGTH*1000)
                     break
                 case 'foundWords':
-                    this.dataValidate       = ajv.compile(joinRoomDataSchema)
+                    this.dataValidate       = ajv.compile(foundWordsDataSchema)
                     if (parsedData)
                     {
                         var validData       = this.dataValidate(parsedMessage['data'])
@@ -240,16 +240,17 @@ module.exports = class wsHandler {
                             break
                         }
                         roomBoard.responses[socket.id]          = {}
-                        roomBoard.responses[socket.id].words    = parsedData['words']
+                        roomBoard.responses[socket.id].words    = parsedData['words'].sort().map((x) => x.toUpperCase())
                         roomBoard.responses[socket.id].name     = socket.name
                         if (Object.keys(roomBoard.responses).length == roomBoard.expectedResponseCount)
                         {
                             console.log("ALL RESPONSES RECEIVED FOR ROOM " + socket.roomCode)
                             this.scoreResults(roomBoard)
-                            messageResponse.event               = "gameResults"
-                            messageResponse.data                = {}
-                            messageResponse.data["winners"]     = roomBoard.winners
-                            messageResponse.data["responses"]   = roomBoard.responses
+                            messageResponse.event                   = "gameResults"
+                            messageResponse.data                    = {}
+                            messageResponse.data["winners"]         = roomBoard.winners
+                            messageResponse.data["unfoundWords"]    = roomBoard.unfoundWords;
+                            messageResponse.data["responses"]       = roomBoard.responses
                             this.sendToWholeRoom(socket.roomCode, messageResponse)
                         }
                     }
@@ -343,6 +344,9 @@ module.exports = class wsHandler {
     scoreResults(board)
     {
         var highestScore = 0
+        board.unfoundWords = []
+        board.unfoundWords = board.words.map((x) => x.toUpperCase())
+
         for (var key in board.responses)
         {
             var response            = board.responses[key]
@@ -401,6 +405,13 @@ module.exports = class wsHandler {
             if (response.score == highestScore)
             {
                 board.winners.push(key)
+            }
+            for (var word in board.responses[key].words)
+            {
+                if (board.unfoundWords.includes(board.responses[key].words[word]))
+                {
+                    board.unfoundWords.splice(board.unfoundWords.indexOf(board.responses[key].words[word]),1)
+                }
             }
         }
     }
