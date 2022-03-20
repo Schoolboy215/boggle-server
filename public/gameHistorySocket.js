@@ -1,4 +1,13 @@
-webSocket       = new WebSocket('wss://'+location.host)
+webSocket = null
+// Allow for TLS and non-TLS websockets
+if (location.protocol == 'https:')
+{
+    webSocket = new WebSocket('wss://'+location.host)
+}
+else if (location.protocol == 'http:')
+{
+    webSocket = new WebSocket('ws://'+location.host)
+}
 numberHolder    = document.getElementById('gameCounter')
 timeSinceHolder = document.getElementById('timeSinceLast')
 
