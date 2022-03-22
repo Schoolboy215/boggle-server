@@ -91,7 +91,8 @@ app.use(session({
     secret:             process.env.SESSION_SECRET,
     resave:             true,
     saveUninitialized:  true,
-    cookie:             { secure: true }
+    // Only use secure cookies if we're doing TLS
+    cookie:             { secure: process.env.SKIP_TLS == 0 ? true : false},
 }))
 
 // Hook our authentication up to the site
