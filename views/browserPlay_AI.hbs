@@ -1,0 +1,32 @@
+<h1 class="display-4">Play vs. AI</h1>
+<p class="lead">Play alone right here in your browser. Note that this method will not get as much attention as the android application and may be missing some features</p>
+<hr>
+<div id="apiTokenInput" class="input-group mb-3">
+    <div class="input-group-prepend">
+        <span class="input-group-text" id="apiTokenLabel">Api token</span>
+    </div>
+    <input id="apiToken" autocomplete="off" name="apiToken" type="text" value={{apiToken}}>
+    <button id="generateSoloBtn" type="submit" class="btn btn-primary">Generate board</button>
+</div>
+<div id="clockHolder" style="display:none">
+    <h3 id="clock">3:00</h3>
+</div>
+<div id="boardHolder" style="display:none">
+    <div id="board"></div>
+    <div id="wordInput" class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="word">Word</span>
+        </div>
+        <input id="wordField" name="word" type="text">
+        <button id="submitWord" type="submit" class="btn btn-primary">Submit</button>
+        <button id="clearWord" class="btn btn-warning">X</button>
+    </div>
+</div>
+<div id="resultsHolder" style="display:none">
+    <p id="playingList" class="h4"></p>
+    <div id="playerLists" class="card-group">
+    </div>
+</div>
+
+
+<script src="/browserPlaySocket.js"></script>

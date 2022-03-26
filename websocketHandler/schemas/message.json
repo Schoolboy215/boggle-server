@@ -22,7 +22,9 @@
                 "error",
                 "response",
 
-                "boardHistoryCount"
+                "boardHistoryCount",
+
+                "browserPlay_soloBoard"
             ]
         },
         "data":

@@ -10,5 +10,15 @@ $theme-colors: (
     width: 100%
 }
 
+.btn-sq {
+    width: 75px !important;
+    height: 75px !important;
+    border: solid !important;
+    border-radius: 0 !important;
+}
+
+.btn-group-lg {
+    display: block !important;
+}
 @import "../node_modules/bootstrap/scss/bootstrap";
 @import "../node_modules/bootstrap-fileinput/scss/fileinput";

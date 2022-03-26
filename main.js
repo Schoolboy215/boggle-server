@@ -125,6 +125,7 @@ loadRoutes = function()
     var authRouter          = require('./authenticate/routes')
     var verifiedRouter      = require('./verified/routes')
     var definitionRouter    = require('./definitionAPI/routes')
+    var browserPlayRouter   = require('./browserPlay/routes')
 
     app.use('/',                indexRouter)
     app.use('/auth',            authRouter)
@@ -132,6 +133,7 @@ loadRoutes = function()
     app.use('/api/words',       verifiedRouter.checkAPIToken, configRouter)
     app.use('/verified',        verifiedRouter.ensureAuthenticated, verifiedRouter.router)
     app.use('/api/definitions', verifiedRouter.checkAPIToken, definitionRouter)
+    app.use('/browserPlay',     browserPlayRouter)
 }
 
 // This is the start method that we will call next

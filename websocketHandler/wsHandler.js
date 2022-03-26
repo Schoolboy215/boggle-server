@@ -72,7 +72,7 @@ module.exports = class wsHandler {
                 return
             }
             var messageType = parsedMessage['event']
-            if (this.apiToken && messageType != 'boardHistory')
+            if (this.apiToken && messageType != 'boardHistoryCount')
             {
                 if (parsedMessage['apiToken'])
                 {
@@ -265,6 +265,17 @@ module.exports = class wsHandler {
                         socket.roomCode = 'homePage'
                     }
                     socket.send(JSON.stringify(await this.getFreshHistory()))
+                    break
+                // In-Browser play
+                // Solo
+                case 'browserPlay_soloBoard':
+                    var b = new Board()
+                    b.fillSquares()
+                    await b.solveBoard()
+                    var startResponse       = new clientResponse()
+                    startResponse.event     = "soloBoard"
+                    startResponse.data      = b
+                    socket.send(JSON.stringify(startResponse))
                     break
                 default:
                     createErrorMessage(messageResponse, "Message type not recognized")
