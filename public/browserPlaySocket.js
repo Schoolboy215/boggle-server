@@ -17,6 +17,7 @@ else if (location.protocol == 'http:')
 webSocket.onopen = function()
 {
     console.log("Connected to websocket for in-browser play")
+    $('#generateSoloBtn').attr("disabled", false)
 }
 
 webSocket.onmessage = function(event)
