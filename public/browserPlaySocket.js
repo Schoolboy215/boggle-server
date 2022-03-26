@@ -105,7 +105,7 @@ function startSoloGame(squares)
     // Clear out the list of found words in case we already played one
     foundWords.length = 0
 
-    timeRemaining = 18
+    timeRemaining = 180
     $('#clock').text(`${Math.floor(timeRemaining/60) > 0 ? Math.floor(timeRemaining/60).toString() : "0"}:${(timeRemaining % 60).toString().padStart(2,"0")}`)
     timer = window.setInterval(timerTick, 1000)
 
