@@ -39,12 +39,18 @@ webSocket.onmessage = function(event)
                 console.error(`WS error response: ${parsedJSON["data"]}`)
                 alert(`WS error response: ${parsedJSON["data"]}`)
                 break
+            case "definition":
+                $('#definitionToast').children('.toast-body').text(`${parsedJSON["data"].definition}`)
+                var definitionToastExample = document.getElementById('definitionToast')
+                var toast = new bootstrap.Toast(definitionToastExample)
+                toast.show()
+                break
             default:
                 console.error("Unrecognized WS response from server")
                 break
         }
     }
-    catch{
+    catch(ex){
         // Invalid JSON received
     }
 }
@@ -237,7 +243,7 @@ function submitWord()
             foundWords.push(word)
             foundWords.sort()
             $('#playingList').text("")
-            $('#playingList').text(foundWords.join(','))
+            $('#playingList').text(foundWords.join(', '))
         }
         $('#wordField').val("")
     }
@@ -254,13 +260,16 @@ function addWordBlock(name, allWords, uniqueWords)
     $playerLists = $('#playerLists')
 
     $newCard = $('<div>', {class: "card bg-light mb-3"})
-    $newCardHeader = $('<div>', {class: "card-header"})
+    $newCardHeader = $('<div>', {class: "card-header h3"})
     $newCardHeader.text(`${name} (${allWords.length} words)`)
     $newCard.append($newCardHeader)
-    $newCardBody = $('<div>', {class: "card-body"})
+    $newCardTable = $('<table>', {class: "table card-table table-hover"})
+    $newCardTableBody = $('<tbody>')
     for (const word of allWords)
     {
-        $newCardText = $('<p>', {class: "card-text"})
+        $newCardRow = $('<tr>')
+        $newCardField = $('<td>')
+        $newCardText = $('<p>', {class: "h4"})
         if (uniqueWords != null && !uniqueWords.includes(word))
         {
             $strikeThroughText = $('<s>')
@@ -271,9 +280,17 @@ function addWordBlock(name, allWords, uniqueWords)
         {
             $newCardText.text(word)
         }
-        $newCardBody.append($newCardText)
+        $newCardField.append($newCardText)
+        $newCardRow.attr('onClick',`lookupDefinition(this)`)
+        $newCardRow.append($newCardField)
+        $newCardTableBody.append($newCardRow)
     }
-    $newCard.append($newCardBody)
+    $newCardTable.append($newCardTableBody)
+    $newCard.append($newCardTable)
 
     $playerLists.append($newCard)
+}
+function lookupDefinition($sender)
+{
+    webSocket.send(`{"event":"definition","status":"ok","apiToken":"${$('#apiToken').val()}","data":{"word":"${$sender.textContent.toLowerCase()}"}}`)
 }

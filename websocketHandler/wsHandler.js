@@ -5,6 +5,7 @@ var Board               = require('../board/board')
 var Ajv                 = require('ajv')
 require('dotenv').config()
 var config = require("../config")
+var definitionAPI = require('../definitionAPI')
 
 var connections             =[]
 var currentGames            = {}
@@ -276,6 +277,13 @@ module.exports = class wsHandler {
                     startResponse.event     = "soloBoard"
                     startResponse.data      = b
                     socket.send(JSON.stringify(startResponse))
+                    break
+                case 'definition':
+                    var definition = await definitionAPI.getWordDefinition(parsedData["word"])
+                    var definitionResponse      = new clientResponse()
+                    definitionResponse.event    = "definition"
+                    definitionResponse.data     = definition
+                    socket.send(JSON.stringify(definitionResponse))
                     break
                 default:
                     createErrorMessage(messageResponse, "Message type not recognized")

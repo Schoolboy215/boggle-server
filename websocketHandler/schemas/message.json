@@ -24,7 +24,8 @@
 
                 "boardHistoryCount",
 
-                "browserPlay_soloBoard"
+                "browserPlay_soloBoard",
+                "definition"
             ]
         },
         "data":
