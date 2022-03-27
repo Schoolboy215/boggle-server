@@ -4,7 +4,8 @@
 //Overrides here
 $theme-colors: (
     "primary":      $cyan,
-    "secondary":    $teal
+    "secondary":    $teal,
+    "warning":      $yellow
 );
 .envInput {
     width: 100%
@@ -20,5 +21,6 @@ $theme-colors: (
 .btn-group-lg {
     display: block !important;
 }
+
 @import "../node_modules/bootstrap/scss/bootstrap";
 @import "../node_modules/bootstrap-fileinput/scss/fileinput";
