@@ -11,7 +11,7 @@
   "dependencies": {
     "ajv": "^6.12.3",
     "body-parser": "^1.18.3",
-    "bootstrap": "^4.4.1",
+    "bootstrap": "^5.0",
     "bootstrap-fileinput": "^5.1.2",
     "connect-flash": "^0.1.1",
     "dotenv": "^8.2.0",
