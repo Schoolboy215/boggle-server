@@ -1,0 +1,245 @@
+{
+  "openapi" : "3.0.0",
+  "servers" : [ ],
+  "info" : {
+    "description" : "API for interacting with an instance of Schoolboy215's boggle server",
+    "version" : "1.0.0",
+    "title" : "Multiplayer Boggle API",
+    "license" : {
+      "name" : "Apache 2.0",
+      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "tags" : [ {
+    "name" : "app",
+    "description" : "Operations accessible on the public API for use in client apps(possibly locked behind an API token)"
+  } ],
+  "paths" : {
+    "/api/boards/create" : {
+      "get" : {
+        "tags" : [ "app" ],
+        "parameters" : [ {
+          "$ref" : "#/components/parameters/api_token"
+        } ],
+        "summary" : "returns a single generated board",
+        "operationId" : "generateBoard",
+        "description" : "Allows for the generation of one full game board with the layout and list of possible words to find\n",
+        "responses" : {
+          "200" : {
+            "description" : "search results matching criteria",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/board"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized, missing api_token in header"
+          }
+        }
+      }
+    },
+    "/api/boards/create/{quantity}" : {
+      "get" : {
+        "tags" : [ "app" ],
+        "summary" : "returns one or more generated boards",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "quantity",
+          "schema" : {
+            "type" : "integer"
+          },
+          "required" : true,
+          "description" : "The number of boards to generate"
+        }, {
+          "$ref" : "#/components/parameters/api_token"
+        } ],
+        "operationId" : "generateBoards",
+        "description" : "Allows for the generation of one or more full game boards with the layout and list of possible words to find\n",
+        "responses" : {
+          "200" : {
+            "description" : "search results matching criteria",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/boards"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized, missing api_token in header"
+          }
+        }
+      }
+    },
+    "/api/words/add" : {
+      "post" : {
+        "tags" : [ "app" ],
+        "summary" : "submit word addition request",
+        "operationId" : "addWords",
+        "description" : "Allows for a user to submit a request for the admin of the server to include word(s) in the dictionary\n",
+        "parameters" : [ {
+          "$ref" : "#/components/parameters/api_token"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/wordList"
+        },
+        "responses" : {
+          "200" : {
+            "description" : "word addition request successfully submitted"
+          },
+          "401" : {
+            "description" : "Unauthorized, missing api_token in header"
+          }
+        }
+      }
+    },
+    "/api/words/remove" : {
+      "post" : {
+        "tags" : [ "app" ],
+        "summary" : "submit word removal request",
+        "operationId" : "removeWords",
+        "description" : "Allows for a user to submit a request for the admin of the server to remove word(s) from the dictionary\n",
+        "parameters" : [ {
+          "$ref" : "#/components/parameters/api_token"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/wordList"
+        },
+        "responses" : {
+          "200" : {
+            "description" : "word removal request successfully submitted"
+          },
+          "401" : {
+            "description" : "Unauthorized, missing api_token in header"
+          }
+        }
+      }
+    },
+    "/api/definitions/define/{word}" : {
+      "get" : {
+        "tags" : [ "app" ],
+        "summary" : "returns the definition of a word",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "word",
+          "schema" : {
+            "type" : "string"
+          },
+          "required" : true,
+          "description" : "The word to lookup a definition for"
+        }, {
+          "$ref" : "#/components/parameters/api_token"
+        } ],
+        "operationId" : "definitionLookup",
+        "description" : "Allows for the lookup of a word's definition. Implementation on the server side will determine the source of this definition\n",
+        "responses" : {
+          "200" : {
+            "description" : "successfully searched for a definition",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/definition"
+                  }, {
+                    "$ref" : "#/components/schemas/noDefinition"
+                  } ]
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized, missing api_token in header"
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "board" : {
+        "type" : "object",
+        "properties" : {
+          "squares" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "words" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        },
+        "description" : "Information related to a single boggle game board. Contains the configuration of the letters and a list of all possible words to find"
+      },
+      "boards" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/board"
+        }
+      },
+      "definition" : {
+        "type" : "object",
+        "properties" : {
+          "word" : {
+            "type" : "string"
+          },
+          "definition" : {
+            "type" : "string"
+          }
+        },
+        "description" : "A definition for the requested word"
+      },
+      "noDefinition" : {
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/definition"
+        }, {
+          "type" : "object",
+          "properties" : {
+            "error" : {
+              "type" : "string"
+            }
+          }
+        } ],
+        "description" : "A failure of some sort occured during definition lookup"
+      },
+      "wordList" : {
+        "type" : "array",
+        "items" : {
+          "type" : "string"
+        }
+      }
+    },
+    "parameters" : {
+      "api_token" : {
+        "name" : "api_token",
+        "in" : "header",
+        "description" : "a token to authenticate valid clients to the server",
+        "required" : false,
+        "schema" : {
+          "type" : "string"
+        }
+      }
+    },
+    "requestBodies" : {
+      "wordList" : {
+        "description" : "The word(s) requested",
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/wordList"
+            },
+            "example" : [ "word1", "word2" ]
+          }
+        }
+      }
+    }
+  }
+}
