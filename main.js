@@ -78,7 +78,7 @@ app.use('/stylesheets',sassMiddleware({
   
 // View engine setup
 app.set('views', path.join(__dirname, 'views'))
-app.engine('hbs', hbs({ 
+app.engine('hbs', hbs.engine({ 
     extname:        'hbs', 
     defaultLayout:  'main',
     layoutsDir:     __dirname + '/views/layouts/',
