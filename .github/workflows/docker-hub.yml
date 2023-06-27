@@ -50,4 +50,3 @@ jobs:
           context: "{{defaultContext}}"
           push: true
           tags: latest
-          tags: ${{ steps.meta.outputs.tags }}
