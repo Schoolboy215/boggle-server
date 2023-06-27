@@ -53,9 +53,9 @@ Aside from the changes page there is also a settings page that allows you to:
 ## Docker ##
 This repository is "dockerized" and automatically pushes a new image to DockerHub every time it changes. Example for how to install/run:
 * Pulls the most recent image from DockerHub and runs it on port 80 in a new container called "boggle-server"
-  * `docker run -p 80:80 -d --name boggle-server schoolboy215/boggle-server:master`
-* Bring up a shell inside the container
-  * `docker exec -it boggle-server bash`
-* Create a .env file and add the key/value pairs appropriate to your setup as outlined above
-* Restart the container
-  * `docker restart boggle-server`
+  * `docker run -p 80:80 -d --name boggle-server schoolboy215/boggle-server`
+* If you need to change the default .env
+  * Bring up a shell inside the container
+    * `docker exec -it boggle-server bash`
+  * Restart the container
+    * `docker restart boggle-server`
