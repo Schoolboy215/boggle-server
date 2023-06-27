@@ -39,6 +39,15 @@ jobs:
         echo GAME_LENGTH="$GAME_LENGTH" >> .env
         echo ROOMCODE_BYTES="$ROOMCODE_BYTES" >> .env
         echo MAX_MULTIBOARD_GEN="$MAX_MULTIBOARDGEN" >> .env
+
+        echo "cat .env"
+        cat .env
+
+        echo "ls -a ."
+        ls -a .
+
+        echo "ls -a ${{ github.workspace }}"
+        ls -a ${{ github.workspace }}
       shell: bash
       
     - uses: actions/checkout@v3
@@ -59,6 +68,15 @@ jobs:
           echo GAME_LENGTH="$GAME_LENGTH" >> .env
           echo ROOMCODE_BYTES="$ROOMCODE_BYTES" >> .env
           echo MAX_MULTIBOARD_GEN="$MAX_MULTIBOARDGEN" >> .env
+
+          echo "cat .env"
+          cat .env
+
+          echo "ls -a ."
+          ls -a .
+
+          echo "ls -a ${{ github.workspace }}"
+          ls -a ${{ github.workspace }}
       - name: Check out the repo
         uses: actions/checkout@v3
 
