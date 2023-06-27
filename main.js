@@ -162,7 +162,14 @@ const startServer = async function()
         }
         
         server.listen(process.env.PORT, function () {
-            console.log('listening on port ' + process.env.PORT.toString())
+            if (typeof process.env.PORT === 'undefined')
+            {
+                console.log('Invalid or missing .env file. Not listening')
+            }
+            else
+            {
+                console.log('listening on port ' + process.env.PORT.toString())
+            }
         })
 
         // Start the websocket server
