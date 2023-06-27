@@ -11,6 +11,16 @@ env:
   IMAGE_NAME: ${{ github.repository }}
   LATEST_TAG: schoolboy215/boggle-server:latest
 
+  # Variables for making the placeholder .env file
+  SESSION_SECRET: secret12345
+  CERT_PATH: ""
+  KEY_PATH: ""
+  PORT: 80
+  SKIP_TLS: 1
+  GAME_LENGTH: 180
+  ROOMCODE_BYTES: 2
+  MAX_MULTIBOARD_GEN: 10
+
 jobs:
 
   build:
@@ -19,15 +29,6 @@ jobs:
 
     steps:
     - name: Create and populate .env file
-      env:
-        SESSION_SECRET: secret12345
-        CERT_PATH: ""
-        KEY_PATH: ""
-        PORT: 80
-        SKIP_TLS: 1
-        GAME_LENGTH: 180
-        ROOMCODE_BYTES: 2
-        MAX_MULTIBOARD_GEN: 10
       run: |
         touch .env
         echo SESSION_SECRET="$SESSION_SECRET" >> .env
@@ -47,6 +48,17 @@ jobs:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     steps:
+      - name: Create and populate .env file
+        run: |
+          touch .env
+          echo SESSION_SECRET="$SESSION_SECRET" >> .env
+          echo CERT_PATH="$CERT_PATH" >> .env
+          echo KEY_PATH="$KEY_PATH" >> .env
+          echo PORT="$PORT" >> .env
+          echo SKIP_TLS="$SKIP_TLS" >> .env
+          echo GAME_LENGTH="$GAME_LENGTH" >> .env
+          echo ROOMCODE_BYTES="$ROOMCODE_BYTES" >> .env
+          echo MAX_MULTIBOARD_GEN="$MAX_MULTIBOARDGEN" >> .env
       - name: Check out the repo
         uses: actions/checkout@v3
 
