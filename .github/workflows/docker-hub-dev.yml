@@ -12,9 +12,9 @@ env:
   LATEST_TAG: schoolboy215/boggle-server:dev
 
   # Variables for making the placeholder .env file
-  SESSION_SECRET: secret12345
-  CERT_PATH: ""
-  KEY_PATH: ""
+  SESSION_SECRET: \"secret12345\""
+  CERT_PATH: "\"\""
+  KEY_PATH: "\"\""
   PORT: 80
   SKIP_TLS: 1
   GAME_LENGTH: 180
@@ -38,7 +38,7 @@ jobs:
         echo SKIP_TLS="$SKIP_TLS" >> .env
         echo GAME_LENGTH="$GAME_LENGTH" >> .env
         echo ROOMCODE_BYTES="$ROOMCODE_BYTES" >> .env
-        echo MAX_MULTIBOARD_GEN="$MAX_MULTIBOARDGEN" >> .env
+        echo MAX_MULTIBOARD_GEN="$MAX_MULTIBOARD_GEN" >> .env
 
         echo "cat .env"
         cat .env
@@ -57,27 +57,6 @@ jobs:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     steps:
-      - name: Create and populate .env file
-        run: |
-          touch .env
-          echo SESSION_SECRET="$SESSION_SECRET" >> .env
-          echo CERT_PATH="$CERT_PATH" >> .env
-          echo KEY_PATH="$KEY_PATH" >> .env
-          echo PORT="$PORT" >> .env
-          echo SKIP_TLS="$SKIP_TLS" >> .env
-          echo GAME_LENGTH="$GAME_LENGTH" >> .env
-          echo ROOMCODE_BYTES="$ROOMCODE_BYTES" >> .env
-          echo MAX_MULTIBOARD_GEN="$MAX_MULTIBOARDGEN" >> .env
-
-          echo "cat .env"
-          cat .env
-
-          echo "ls -a ."
-          ls -a .
-
-          echo "ls -a ${{ github.workspace }}"
-          ls -a ${{ github.workspace }}
-        shell: bash
       - name: Check out the repo
         uses: actions/checkout@v3
 
@@ -95,6 +74,28 @@ jobs:
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Create and populate .env file
+        run: |
+          touch .env
+          echo SESSION_SECRET="$SESSION_SECRET" >> .env
+          echo CERT_PATH="$CERT_PATH" >> .env
+          echo KEY_PATH="$KEY_PATH" >> .env
+          echo PORT="$PORT" >> .env
+          echo SKIP_TLS="$SKIP_TLS" >> .env
+          echo GAME_LENGTH="$GAME_LENGTH" >> .env
+          echo ROOMCODE_BYTES="$ROOMCODE_BYTES" >> .env
+          echo MAX_MULTIBOARD_GEN="$MAX_MULTIBOARD_GEN" >> .env
+
+          echo "cat .env"
+          cat .env
+
+          echo "ls -a ."
+          ls -a .
+
+          echo "ls -a ${{ github.workspace }}"
+          ls -a ${{ github.workspace }}
+        shell: bash
 
       - name: Build and push
         uses: docker/build-push-action@v4
