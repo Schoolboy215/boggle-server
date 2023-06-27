@@ -12,7 +12,7 @@ env:
   LATEST_TAG: schoolboy215/boggle-server:dev
 
   # Variables for making the placeholder .env file
-  SESSION_SECRET: \"secret12345\""
+  SESSION_SECRET: "secret12345"
   CERT_PATH: "\"\""
   KEY_PATH: "\"\""
   PORT: 80
