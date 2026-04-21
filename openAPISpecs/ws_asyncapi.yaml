@@ -1,0 +1,611 @@
+asyncapi: '2.6.0'
+
+info:
+  title: Boggle Server WebSocket API
+  version: '1.0.0'
+  description: >
+    Real-time WebSocket API for multiplayer and solo Boggle gameplay.
+    The WebSocket server shares a port with the HTTP server.
+    All client messages (except the raw connection-ID frame) are JSON.
+
+servers:
+  production:
+    url: wss://{host}
+    protocol: wss
+    description: >
+      If the server has an API token configured, include it as a query parameter:
+      wss://host?token=<your_token>. The token is validated at connection time.
+      boardHistoryCount is the only event that works on unauthenticated connections.
+    variables:
+      host:
+        description: Server hostname and optional port (e.g. example.com or localhost:443)
+  insecure:
+    url: ws://{host}
+    protocol: ws
+    description: Used when SKIP_TLS=1 is set in the server .env
+    variables:
+      host:
+        description: Server hostname and optional port
+
+channels:
+  /:
+    description: >
+      Single persistent connection used for all gameplay events.
+      On connect the server immediately sends a raw (non-JSON) hex string
+      that is your socket ID. All subsequent frames in both directions are JSON.
+    bindings:
+      ws:
+        method: GET
+
+    subscribe:
+      summary: Messages sent FROM the server TO the client
+      message:
+        oneOf:
+          - $ref: '#/components/messages/ConnectionId'
+          - $ref: '#/components/messages/RoomCodeResponse'
+          - $ref: '#/components/messages/JoinSuccessResponse'
+          - $ref: '#/components/messages/JoinNotification'
+          - $ref: '#/components/messages/LeaveSuccessResponse'
+          - $ref: '#/components/messages/LeaveNotification'
+          - $ref: '#/components/messages/GameStart'
+          - $ref: '#/components/messages/GameEnd'
+          - $ref: '#/components/messages/GameResults'
+          - $ref: '#/components/messages/BoardHistoryCountResponse'
+          - $ref: '#/components/messages/SoloBoardResponse'
+          - $ref: '#/components/messages/DefinitionResponse'
+          - $ref: '#/components/messages/ErrorResponse'
+
+    publish:
+      summary: Messages sent FROM the client TO the server
+      message:
+        oneOf:
+          - $ref: '#/components/messages/CreateRoom'
+          - $ref: '#/components/messages/JoinRoom'
+          - $ref: '#/components/messages/LeaveRoom'
+          - $ref: '#/components/messages/StartGame'
+          - $ref: '#/components/messages/FoundWords'
+          - $ref: '#/components/messages/BoardHistoryCount'
+          - $ref: '#/components/messages/BrowserPlaySoloBoard'
+          - $ref: '#/components/messages/Definition'
+
+components:
+
+  schemas:
+
+    BaseClientMessage:
+      type: object
+      required: [event]
+      properties:
+        event:
+          type: string
+        data:
+          type: object
+          description: Event-specific payload (required for some events)
+
+    BaseServerMessage:
+      type: object
+      required: [status, event]
+      properties:
+        status:
+          type: string
+          enum: [ok, error]
+        event:
+          type: string
+        data:
+          description: Event-specific payload
+
+    Board:
+      type: object
+      description: A fully solved 4×4 Boggle board
+      properties:
+        squares:
+          type: array
+          items:
+            type: string
+          minItems: 16
+          maxItems: 16
+          description: >
+            16 letter tiles in row-major order (index 0 = top-left, 15 = bottom-right).
+            "Qu" is a possible tile value.
+          example: ["A","E","T","S","R","I","N","O","L","D","U","H","G","W","E","N"]
+        words:
+          type: array
+          items:
+            type: string
+          description: Every valid word findable on this board (lower-case, sorted)
+        inProgress:
+          type: boolean
+          description: True while the game timer is running
+        duration:
+          type: integer
+          description: Game length in seconds (controlled by GAME_LENGTH env var)
+        expectedResponseCount:
+          type: integer
+          description: Number of players from whom the server is expecting foundWords
+
+    PlayerResult:
+      type: object
+      description: One player's scored result after a game
+      properties:
+        name:
+          type: string
+          description: Display name of the player
+        words:
+          type: array
+          items:
+            type: string
+          description: All words submitted by this player (upper-cased, sorted)
+        uniqueWords:
+          type: array
+          items:
+            type: string
+          description: Words found only by this player (used for scoring)
+        score:
+          type: integer
+          description: >
+            Points earned from unique words only.
+            3-4 letter words = 1pt, 5 = 2pt, 6 = 3pt, 7+ = 11pt.
+
+    Definition:
+      type: object
+      properties:
+        word:
+          type: string
+        definition:
+          type: string
+          description: Present on success
+        error:
+          type: string
+          description: Present when lookup failed
+
+  messages:
+
+    # ── Server → Client ───────────────────────────────────────────────────────
+
+    ConnectionId:
+      name: connectionId
+      title: Connection ID (raw frame)
+      summary: >
+        Sent immediately on connection before any JSON frames.
+        The value is a raw 16-character hex string — NOT wrapped in JSON.
+        Store it; it is used as the key in gameResults.responses.
+      contentType: text/plain
+      payload:
+        type: string
+        pattern: '^[0-9a-f]{16}$'
+        description: 16-hex-char socket ID (8 random bytes)
+        example: "a3f1b2c4d5e6f708"
+
+    RoomCodeResponse:
+      name: roomCodeResponse
+      title: Room Code
+      summary: Response to createRoom — the newly created room's join code
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/BaseServerMessage'
+          - type: object
+            properties:
+              event:
+                type: string
+                enum: [roomCode]
+              data:
+                type: string
+                description: Hex room code to share with other players
+                example: "3fa2"
+
+    JoinSuccessResponse:
+      name: joinSuccessResponse
+      title: Join Success
+      summary: Acknowledgement that joinRoom succeeded; the socket is now in the room
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/BaseServerMessage'
+          - type: object
+            properties:
+              event:
+                type: string
+                enum: [joinSuccess]
+
+    JoinNotification:
+      name: joinNotification
+      title: Join Notification
+      summary: >
+        Broadcast to ALL existing members of a room when a new player joins.
+        (The joining player receives joinSuccess instead.)
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/BaseServerMessage'
+          - type: object
+            properties:
+              event:
+                type: string
+                enum: [joinNotification]
+              data:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: Display name of the player who just joined
+
+    LeaveSuccessResponse:
+      name: leaveSuccessResponse
+      title: Leave Success
+      summary: Acknowledgement that leaveRoom succeeded; the socket is no longer in a room
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/BaseServerMessage'
+          - type: object
+            properties:
+              event:
+                type: string
+                enum: [leaveSuccess]
+
+    LeaveNotification:
+      name: leaveNotification
+      title: Leave Notification
+      summary: Broadcast to remaining room members when a player leaves
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/BaseServerMessage'
+          - type: object
+            properties:
+              event:
+                type: string
+                enum: [leaveNotification]
+              data:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: Display name of the player who left
+
+    GameStart:
+      name: gameStart
+      title: Game Start
+      summary: >
+        Broadcast to all room members when a game is started.
+        Contains the full board; clients should start their timers.
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/BaseServerMessage'
+          - type: object
+            properties:
+              event:
+                type: string
+                enum: [gameStart]
+              data:
+                $ref: '#/components/schemas/Board'
+
+    GameEnd:
+      name: gameEnd
+      title: Game End
+      summary: >
+        Broadcast to all room members when the server-side timer expires.
+        Players should submit their foundWords after receiving this.
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/BaseServerMessage'
+          - type: object
+            properties:
+              event:
+                type: string
+                enum: [gameEnd]
+              data:
+                type: string
+                example: "Clock ran out"
+
+    GameResults:
+      name: gameResults
+      title: Game Results
+      summary: >
+        Broadcast to all room members once every player has submitted foundWords.
+        Contains full scoring details.
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/BaseServerMessage'
+          - type: object
+            properties:
+              event:
+                type: string
+                enum: [gameResults]
+              data:
+                type: object
+                properties:
+                  winners:
+                    type: array
+                    items:
+                      type: string
+                    description: >
+                      Socket IDs of the player(s) with the highest score.
+                      Use the connection ID received on connect to identify yourself.
+                  unfoundWords:
+                    type: array
+                    items:
+                      type: string
+                    description: Words on the board that no player submitted
+                  responses:
+                    type: object
+                    additionalProperties:
+                      $ref: '#/components/schemas/PlayerResult'
+                    description: Map of socketId → scored player result
+
+    BoardHistoryCountResponse:
+      name: boardHistoryCountResponse
+      title: Board History Count
+      summary: >
+        Response to boardHistoryCount. Also pushed automatically to any socket
+        whose roomCode is 'homePage' whenever new boards are generated.
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/BaseServerMessage'
+          - type: object
+            properties:
+              event:
+                type: string
+                enum: [boardHistoryCount]
+              data:
+                type: object
+                properties:
+                  history:
+                    type: array
+                    description: Board generation history records from the SQLite database
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                          format: date-time
+
+    SoloBoardResponse:
+      name: soloBoardResponse
+      title: Solo Board
+      summary: Response to browserPlay_soloBoard — a fresh board for in-browser solo play
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/BaseServerMessage'
+          - type: object
+            properties:
+              event:
+                type: string
+                enum: [soloBoard]
+              data:
+                $ref: '#/components/schemas/Board'
+
+    DefinitionResponse:
+      name: definitionResponse
+      title: Definition
+      summary: Response to a definition request
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/BaseServerMessage'
+          - type: object
+            properties:
+              event:
+                type: string
+                enum: [definition]
+              data:
+                $ref: '#/components/schemas/Definition'
+
+    ErrorResponse:
+      name: errorResponse
+      title: Error
+      summary: >
+        Returned whenever a message fails JSON parsing, schema validation,
+        API token checking, or business-logic rules (e.g. wrong room state).
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/BaseServerMessage'
+          - type: object
+            properties:
+              status:
+                type: string
+                enum: [error]
+              event:
+                type: string
+                enum: [error]
+              data:
+                description: >
+                  Error details. Either a plain string or an AJV error array
+                  when the message failed JSON Schema validation.
+
+    # ── Client → Server ───────────────────────────────────────────────────────
+
+    CreateRoom:
+      name: createRoom
+      title: Create Room
+      summary: >
+        Create a new multiplayer room. The socket becomes the room host.
+        Server responds with roomCode.
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/BaseClientMessage'
+          - type: object
+            properties:
+              event:
+                type: string
+                enum: [createRoom]
+              data:
+                type: object
+                required: [name]
+                properties:
+                  name:
+                    type: string
+                    description: Display name for this player
+      examples:
+        - name: basic
+          payload:
+            event: createRoom
+            data:
+              name: "Alice"
+
+    JoinRoom:
+      name: joinRoom
+      title: Join Room
+      summary: >
+        Join an existing room using the host's room code.
+        On success the server responds with joinSuccess and broadcasts
+        joinNotification to all existing room members.
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/BaseClientMessage'
+          - type: object
+            properties:
+              event:
+                type: string
+                enum: [joinRoom]
+              data:
+                type: object
+                required: [name, roomCode]
+                properties:
+                  name:
+                    type: string
+                    description: Display name for this player
+                  roomCode:
+                    type: string
+                    description: Code received from the room host
+      examples:
+        - name: basic
+          payload:
+            event: joinRoom
+            data:
+              name: "Bob"
+              roomCode: "3fa2"
+
+    LeaveRoom:
+      name: leaveRoom
+      title: Leave Room
+      summary: >
+        Leave the current room. The socket is removed from the room and
+        remaining members receive a leaveNotification. If a game has ended
+        but this player had not yet submitted foundWords, they are removed
+        from the expected response count and results may be triggered early.
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/BaseClientMessage'
+          - type: object
+            properties:
+              event:
+                type: string
+                enum: [leaveRoom]
+      examples:
+        - name: basic
+          payload:
+            event: leaveRoom
+
+    StartGame:
+      name: startGame
+      title: Start Game
+      summary: >
+        Start a game in the current room. Any room member may trigger this.
+        The server generates a board, broadcasts gameStart to all members,
+        then automatically broadcasts gameEnd after GAME_LENGTH seconds.
+        Fails if the socket is not in a room or a game is already in progress.
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/BaseClientMessage'
+          - type: object
+            properties:
+              event:
+                type: string
+                enum: [startGame]
+      examples:
+        - name: basic
+          payload:
+            event: startGame
+
+    FoundWords:
+      name: foundWords
+      title: Found Words
+      summary: >
+        Submit the words found during the game. Must be sent after receiving gameEnd.
+        Once all room members have submitted, the server broadcasts gameResults.
+        Fails if the game is still in progress.
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/BaseClientMessage'
+          - type: object
+            properties:
+              event:
+                type: string
+                enum: [foundWords]
+              data:
+                type: object
+                required: [words]
+                properties:
+                  words:
+                    type: array
+                    items:
+                      type: string
+                    description: Words found by this player (case-insensitive; server upper-cases them)
+      examples:
+        - name: basic
+          payload:
+            event: foundWords
+            data:
+              words: ["cat", "rate", "tear", "later"]
+
+    BoardHistoryCount:
+      name: boardHistoryCount
+      title: Board History Count
+      summary: >
+        Request board generation history. Does NOT require an apiToken even when
+        the server has one configured. If the socket has no room assigned, it is
+        placed in the virtual 'homePage' room and will receive automatic pushes
+        of this event whenever new boards are generated via the HTTP API.
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/BaseClientMessage'
+          - type: object
+            properties:
+              event:
+                type: string
+                enum: [boardHistoryCount]
+      examples:
+        - name: basic
+          payload:
+            event: boardHistoryCount
+
+    BrowserPlaySoloBoard:
+      name: browserPlay_soloBoard
+      title: Solo Board Request
+      summary: >
+        Request a freshly generated and solved board for in-browser solo play.
+        Server responds with a soloBoard event.
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/BaseClientMessage'
+          - type: object
+            properties:
+              event:
+                type: string
+                enum: [browserPlay_soloBoard]
+      examples:
+        - name: basic
+          payload:
+            event: browserPlay_soloBoard
+
+    Definition:
+      name: definition
+      title: Definition Request
+      summary: Look up the definition of a word. Server responds with a definition event.
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/BaseClientMessage'
+          - type: object
+            properties:
+              event:
+                type: string
+                enum: [definition]
+              data:
+                type: object
+                required: [word]
+                properties:
+                  word:
+                    type: string
+                    description: The word to look up
+      examples:
+        - name: basic
+          payload:
+            event: definition
+            data:
+              word: "boggle"

@@ -4,14 +4,17 @@ foundWords = []
 var timer;
 var timeRemaining;
 
-// Allow for TLS and non-TLS websockets
+// Allow for TLS and non-TLS websockets.
+// The apiToken input is rendered server-side, so its value is available here at parse time.
+var _token      = document.getElementById('apiToken').value
+var _tokenParam = _token ? '?token=' + encodeURIComponent(_token) : ''
 if (location.protocol == 'https:')
 {
-    webSocket = new WebSocket('wss://'+location.host)
+    webSocket = new WebSocket('wss://' + location.host + _tokenParam)
 }
 else if (location.protocol == 'http:')
 {
-    webSocket = new WebSocket('ws://'+location.host)
+    webSocket = new WebSocket('ws://' + location.host + _tokenParam)
 }
 
 webSocket.onopen = function()
@@ -73,7 +76,7 @@ $(function(){
 // Simply sends the WS request
 function generateSoloBoard()
 {
-    webSocket.send(`{"event":"browserPlay_soloBoard","status":"ok","apiToken":"${$('#apiToken').val()}"}`)
+    webSocket.send(JSON.stringify({ event: "browserPlay_soloBoard" }))
 }
 
 // Called from startSoloGame()
@@ -292,5 +295,5 @@ function addWordBlock(name, allWords, uniqueWords)
 }
 function lookupDefinition($sender)
 {
-    webSocket.send(`{"event":"definition","status":"ok","apiToken":"${$('#apiToken').val()}","data":{"word":"${$sender.textContent.toLowerCase()}"}}`)
+    webSocket.send(JSON.stringify({ event: "definition", data: { word: $sender.textContent.toLowerCase() } }))
 }

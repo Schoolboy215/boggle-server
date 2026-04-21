@@ -59,3 +59,11 @@ This repository is "dockerized" and automatically pushes a new image to DockerHu
     * `docker exec -it boggle-server bash`
   * Restart the container
     * `docker restart boggle-server`
+
+## Generating documentation
+
+The AsyncAPI yaml file `openAPISpecs/ws_asyncapi.yaml` can be turned into a browseable site by running the following commands
+
+`npx @asyncapi/cli generate fromTemplate openAPISpecs/ws_asyncapi.yaml @asyncapi/markdown-template@1.6.0 -o ./doc`
+
+`mkdocs build`

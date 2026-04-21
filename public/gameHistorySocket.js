@@ -14,7 +14,7 @@ timeSinceHolder = document.getElementById('timeSinceLast')
 webSocket.onopen = function()
 {
     console.log("Connected to websocket for stat updates")
-    webSocket.send('{"event":"boardHistoryCount","status":"ok"}')
+    webSocket.send(JSON.stringify({ event: "boardHistoryCount" }))
 }
 
 webSocket.onmessage = function(event)

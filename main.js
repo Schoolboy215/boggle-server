@@ -110,6 +110,7 @@ app.use(function(req, res, next){
 
 // Ensure that public things like stylesheets are available
 app.use(express.static(path.join(__dirname, 'public'), { dotfiles: 'allow' }))
+app.use('/docs', express.static(path.join(__dirname, 'site')))
 
 //Expose our node_module versions of js libraries
 app.use("/bootstrap",express.static(__dirname + '/node_modules/bootstrap/dist'))
@@ -177,8 +178,8 @@ const startServer = async function()
 
         // This is our custom handler. See that module for details
         var handler = new wsHandler.wsHandler()
-        wss.on('connection', (socket) => {
-            handler.handleConnection(socket)
+        wss.on('connection', (socket, request) => {
+            handler.handleConnection(socket, request)
         })
         
         // We use this event to attach our websocket handler to any incoming request in case they need to push out messages

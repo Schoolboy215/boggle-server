@@ -57,6 +57,9 @@ typings/
 # dotenv environment variables file
 .env
 
+# api token
+.apiToken
+
 # next.js build output
 .next
 
@@ -69,3 +72,6 @@ cert.pem
 
 # Generated stylesheets
 public/stylesheets/
+
+# Generated docs
+docs

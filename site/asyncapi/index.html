@@ -1,0 +1,2478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="generator" content="mkdocs-1.6.1, mkdocs-terminal-4.8.0">
+     
+     
+    <link rel="icon" type="image/png" sizes="192x192" href="../img/android-chrome-192x192.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="../img/android-chrome-512x512.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="../img/apple-touch-icon.png" />
+<link rel="shortcut icon" type="image/png" sizes="48x48" href="../img/favicon.ico" />
+<link rel="icon" type="image/png" sizes="16x16" href="../img/favicon-16x16.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="../img/favicon-32x32.png" />
+
+
+    
+ 
+<title>WebSocket API - Boggle Server API Docs</title>
+
+
+<link href="../css/fontawesome/css/fontawesome.min.css" rel="stylesheet">
+<link href="../css/fontawesome/css/solid.min.css" rel="stylesheet">
+<link href="../css/normalize.css" rel="stylesheet">
+<link href="../css/terminal.css" rel="stylesheet">
+<link href="../css/theme.css" rel="stylesheet">
+<link href="../css/theme.tile_grid.css" rel="stylesheet">
+<link href="../css/theme.footer.css" rel="stylesheet">
+<!-- default color palette -->
+<link href="../css/palettes/default.css" rel="stylesheet">
+
+<!-- page layout -->
+<style>
+/* initially set page layout to a one column grid */
+.terminal-mkdocs-main-grid {
+    display: grid;
+    grid-column-gap: 1.4em;
+    grid-template-columns: auto;
+    grid-template-rows: auto;
+}
+
+/*  
+*   when side navigation is not hidden, use a two column grid.  
+*   if the screen is too narrow, fall back to the initial one column grid layout.
+*   in this case the main content will be placed under the navigation panel. 
+*/
+@media only screen and (min-width: 70em) {
+    .terminal-mkdocs-main-grid {
+        grid-template-columns: 4fr 9fr;
+    }
+}</style>
+
+
+
+     
+    
+    
+
+    
+    <!-- search css support -->
+<link href="../css/search/bootstrap-modal.css" rel="stylesheet">
+<!-- search scripts -->
+<script>
+    var base_url = "..",
+    shortcuts = "{}";
+</script>
+<script src="../js/jquery/jquery-1.10.1.min.js" defer></script>
+<script src="../js/bootstrap/bootstrap.min.js" defer></script>
+<script src="../js/mkdocs/base.js" defer></script>
+    
+    
+    
+    
+    <script src="../search/main.js"></script>
+    
+
+    
+</head>
+
+<body class="terminal"><div class="container">
+    <div class="terminal-nav">
+        <header class="terminal-logo">
+            <div id="mkdocs-terminal-site-name" class="logo terminal-prompt"><a href="/" class="no-style">Boggle Server API Docs</a></div>
+        </header>
+        
+        <nav class="terminal-menu">
+            
+            <ul vocab="https://schema.org/" typeof="BreadcrumbList">
+                
+                
+                <li property="itemListElement" typeof="ListItem">
+                    <a href=".." class="menu-item " property="item" typeof="WebPage">
+                        <span property="name">Home</span>
+                    </a>
+                    <meta property="position" content="0">
+                </li>
+                
+                
+                <li property="itemListElement" typeof="ListItem">
+                    <a href="./" class="menu-item active" property="item" typeof="WebPage">
+                        <span property="name">WebSocket API</span>
+                    </a>
+                    <meta property="position" content="1">
+                </li>
+                
+                    
+                    
+
+
+<li property="itemListElement" typeof="ListItem">
+    <a href="#" class="menu-item" data-toggle="modal" data-target="#mkdocs_search_modal" property="item" typeof="SearchAction">
+        <i aria-hidden="true" class="fa fa-search"></i> <span property="name">Search</span>
+    </a>
+    <meta property="position" content="2">
+</li>
+                    
+            </ul>
+            
+        </nav>
+    </div>
+</div>
+        
+    <div class="container">
+        <div class="terminal-mkdocs-main-grid"><aside id="terminal-mkdocs-side-panel"><nav>
+    <ul class="terminal-mkdocs-side-nav-items">
+        
+          <li class="terminal-mkdocs-side-nav-li">
+    
+    
+    
+        
+        
+            <a class="terminal-mkdocs-side-nav-item" href="..">Home</a>
+        
+    
+    
+    
+       </li>
+        
+          <li class="terminal-mkdocs-side-nav-li">
+    
+    
+    
+        
+        <span class="terminal-mkdocs-side-nav-item--active">WebSocket API</span>
+    
+    
+    
+       </li>
+        
+    </ul>
+</nav><hr>
+<nav>
+    <ul>
+        <li><a href="#boggle-server-websocket-api-100-documentation">Boggle Server WebSocket API 1.0.0 documentation</a></li>
+        <li><a href="#table-of-contents">Table of Contents</a></li><li><a href="#servers">Servers</a></li><li><a href="#operations">Operations</a></li>
+    </ul>
+</nav>
+</aside>
+            <main id="terminal-mkdocs-main-content">
+<section id="mkdocs-terminal-content">
+    <h1 id="boggle-server-websocket-api-100-documentation">Boggle Server WebSocket API 1.0.0 documentation</h1>
+<p>Real-time WebSocket API for multiplayer and solo Boggle gameplay. The WebSocket server shares a port with the HTTP server. All client messages (except the raw connection-ID frame) are JSON.</p>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#servers">Servers</a></li>
+<li><a href="#production-server">production</a></li>
+<li><a href="#insecure-server">insecure</a></li>
+<li><a href="#operations">Operations</a></li>
+<li><a href="#pub--operation">PUB /</a></li>
+<li><a href="#sub--operation">SUB /</a></li>
+</ul>
+<h2 id="servers">Servers</h2>
+<h3 id="production-server"><code>production</code> Server</h3>
+<ul>
+<li>URL: <code>wss://{host}</code></li>
+<li>Protocol: <code>wss</code></li>
+</ul>
+<p>If the server has an API token configured, include it as a query parameter: wss://host?token=<your_token>. The token is validated at connection time. boardHistoryCount is the only event that works on unauthenticated connections.</p>
+<h4 id="url-variables">URL Variables</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Default value</th>
+<th>Allowed values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>host</td>
+<td>Server hostname and optional port (e.g. example.com or localhost:443)</td>
+<td><em>None</em></td>
+<td><em>Any</em></td>
+</tr>
+</tbody>
+</table>
+<h3 id="insecure-server"><code>insecure</code> Server</h3>
+<ul>
+<li>URL: <code>ws://{host}</code></li>
+<li>Protocol: <code>ws</code></li>
+</ul>
+<p>Used when SKIP_TLS=1 is set in the server .env</p>
+<h4 id="url-variables_1">URL Variables</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Default value</th>
+<th>Allowed values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>host</td>
+<td>Server hostname and optional port</td>
+<td><em>None</em></td>
+<td><em>Any</em></td>
+</tr>
+</tbody>
+</table>
+<h2 id="operations">Operations</h2>
+<h3 id="pub-operation">PUB <code>/</code> Operation</h3>
+<p><em>Messages sent FROM the client TO the server</em></p>
+<p>Single persistent connection used for all gameplay events. On connect the server immediately sends a raw (non-JSON) hex string that is your socket ID. All subsequent frames in both directions are JSON.</p>
+<h4 id="ws-channel-specific-information"><code>ws</code> Channel specific information</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>method</td>
+<td>-</td>
+<td>-</td>
+<td><code>"GET"</code></td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<p>Accepts <strong>one of</strong> the following messages:</p>
+<h4 id="message-create-room-createroom">Message Create Room <code>createRoom</code></h4>
+<p>*Create a new multiplayer room. The socket becomes the room host. Server responds with roomCode.
+*</p>
+<h5 id="payload">Payload</h5>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(root)</td>
+<td>allOf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>0 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>event</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>data</td>
+<td>object</td>
+<td>Event-specific payload (required for some events)</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.event</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"createRoom"</code>)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.data.name</td>
+<td>string</td>
+<td>Display name for this player</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Examples of payload</p>
+</blockquote>
+<p><em>basic</em></p>
+<pre><code class="language-json">{
+  &quot;event&quot;: &quot;createRoom&quot;,
+  &quot;data&quot;: {
+    &quot;name&quot;: &quot;Alice&quot;
+  }
+}
+</code></pre>
+<h4 id="message-join-room-joinroom">Message Join Room <code>joinRoom</code></h4>
+<p>*Join an existing room using the host's room code. On success the server responds with joinSuccess and broadcasts joinNotification to all existing room members.
+*</p>
+<h5 id="payload_1">Payload</h5>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(root)</td>
+<td>allOf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>0 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>event</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>data</td>
+<td>object</td>
+<td>Event-specific payload (required for some events)</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.event</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"joinRoom"</code>)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.data.name</td>
+<td>string</td>
+<td>Display name for this player</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>1.data.roomCode</td>
+<td>string</td>
+<td>Code received from the room host</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Examples of payload</p>
+</blockquote>
+<p><em>basic</em></p>
+<pre><code class="language-json">{
+  &quot;event&quot;: &quot;joinRoom&quot;,
+  &quot;data&quot;: {
+    &quot;name&quot;: &quot;Bob&quot;,
+    &quot;roomCode&quot;: &quot;3fa2&quot;
+  }
+}
+</code></pre>
+<h4 id="message-leave-room-leaveroom">Message Leave Room <code>leaveRoom</code></h4>
+<p>*Leave the current room. The socket is removed from the room and remaining members receive a leaveNotification. If a game has ended but this player had not yet submitted foundWords, they are removed from the expected response count and results may be triggered early.
+*</p>
+<h5 id="payload_2">Payload</h5>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(root)</td>
+<td>allOf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>0 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>event</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>data</td>
+<td>object</td>
+<td>Event-specific payload (required for some events)</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.event</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"leaveRoom"</code>)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Examples of payload</p>
+</blockquote>
+<p><em>basic</em></p>
+<pre><code class="language-json">{
+  &quot;event&quot;: &quot;leaveRoom&quot;
+}
+</code></pre>
+<h4 id="message-start-game-startgame">Message Start Game <code>startGame</code></h4>
+<p>*Start a game in the current room. Any room member may trigger this. The server generates a board, broadcasts gameStart to all members, then automatically broadcasts gameEnd after GAME_LENGTH seconds. Fails if the socket is not in a room or a game is already in progress.
+*</p>
+<h5 id="payload_3">Payload</h5>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(root)</td>
+<td>allOf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>0 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>event</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>data</td>
+<td>object</td>
+<td>Event-specific payload (required for some events)</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.event</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"startGame"</code>)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Examples of payload</p>
+</blockquote>
+<p><em>basic</em></p>
+<pre><code class="language-json">{
+  &quot;event&quot;: &quot;startGame&quot;
+}
+</code></pre>
+<h4 id="message-found-words-foundwords">Message Found Words <code>foundWords</code></h4>
+<p>*Submit the words found during the game. Must be sent after receiving gameEnd. Once all room members have submitted, the server broadcasts gameResults. Fails if the game is still in progress.
+*</p>
+<h5 id="payload_4">Payload</h5>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(root)</td>
+<td>allOf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>0 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>event</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>data</td>
+<td>object</td>
+<td>Event-specific payload (required for some events)</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.event</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"foundWords"</code>)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.data.words</td>
+<td>array<string></td>
+<td>Words found by this player (case-insensitive; server upper-cases them)</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>1.data.words (single item)</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Examples of payload</p>
+</blockquote>
+<p><em>basic</em></p>
+<pre><code class="language-json">{
+  &quot;event&quot;: &quot;foundWords&quot;,
+  &quot;data&quot;: {
+    &quot;words&quot;: [
+      &quot;cat&quot;,
+      &quot;rate&quot;,
+      &quot;tear&quot;,
+      &quot;later&quot;
+    ]
+  }
+}
+</code></pre>
+<h4 id="message-board-history-count-boardhistorycount">Message Board History Count <code>boardHistoryCount</code></h4>
+<p>*Request board generation history. Does NOT require an apiToken even when the server has one configured. If the socket has no room assigned, it is placed in the virtual 'homePage' room and will receive automatic pushes of this event whenever new boards are generated via the HTTP API.
+*</p>
+<h5 id="payload_5">Payload</h5>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(root)</td>
+<td>allOf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>0 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>event</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>data</td>
+<td>object</td>
+<td>Event-specific payload (required for some events)</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.event</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"boardHistoryCount"</code>)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Examples of payload</p>
+</blockquote>
+<p><em>basic</em></p>
+<pre><code class="language-json">{
+  &quot;event&quot;: &quot;boardHistoryCount&quot;
+}
+</code></pre>
+<h4 id="message-solo-board-request-browserplay_soloboard">Message Solo Board Request <code>browserPlay_soloBoard</code></h4>
+<p>*Request a freshly generated and solved board for in-browser solo play. Server responds with a soloBoard event.
+*</p>
+<h5 id="payload_6">Payload</h5>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(root)</td>
+<td>allOf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>0 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>event</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>data</td>
+<td>object</td>
+<td>Event-specific payload (required for some events)</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.event</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"browserPlay_soloBoard"</code>)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Examples of payload</p>
+</blockquote>
+<p><em>basic</em></p>
+<pre><code class="language-json">{
+  &quot;event&quot;: &quot;browserPlay_soloBoard&quot;
+}
+</code></pre>
+<h4 id="message-definition-request-definition">Message Definition Request <code>definition</code></h4>
+<p><em>Look up the definition of a word. Server responds with a definition event.</em></p>
+<h5 id="payload_7">Payload</h5>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(root)</td>
+<td>allOf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>0 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>event</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>data</td>
+<td>object</td>
+<td>Event-specific payload (required for some events)</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.event</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"definition"</code>)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.data.word</td>
+<td>string</td>
+<td>The word to look up</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Examples of payload</p>
+</blockquote>
+<p><em>basic</em></p>
+<pre><code class="language-json">{
+  &quot;event&quot;: &quot;definition&quot;,
+  &quot;data&quot;: {
+    &quot;word&quot;: &quot;boggle&quot;
+  }
+}
+</code></pre>
+<h3 id="sub-operation">SUB <code>/</code> Operation</h3>
+<p><em>Messages sent FROM the server TO the client</em></p>
+<p>Single persistent connection used for all gameplay events. On connect the server immediately sends a raw (non-JSON) hex string that is your socket ID. All subsequent frames in both directions are JSON.</p>
+<h4 id="ws-channel-specific-information_1"><code>ws</code> Channel specific information</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>method</td>
+<td>-</td>
+<td>-</td>
+<td><code>"GET"</code></td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<p>Accepts <strong>one of</strong> the following messages:</p>
+<h4 id="message-connection-id-raw-frame-connectionid">Message Connection ID (raw frame) <code>connectionId</code></h4>
+<p>*Sent immediately on connection before any JSON frames. The value is a raw 16-character hex string — NOT wrapped in JSON. Store it; it is used as the key in gameResults.responses.
+*</p>
+<ul>
+<li>Content type: <a href="https://www.iana.org/assignments/media-types/text/plain">text/plain</a></li>
+</ul>
+<h5 id="payload_8">Payload</h5>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(root)</td>
+<td>string</td>
+<td>16-hex-char socket ID (8 random bytes)</td>
+<td>-</td>
+<td>pattern (<code>^[0-9a-f]{16}$</code>)</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Examples of payload <em>(generated)</em></p>
+</blockquote>
+<pre><code class="language-json">&quot;a3f1b2c4d5e6f708&quot;
+</code></pre>
+<h4 id="message-room-code-roomcoderesponse">Message Room Code <code>roomCodeResponse</code></h4>
+<p><em>Response to createRoom — the newly created room's join code</em></p>
+<h5 id="payload_9">Payload</h5>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(root)</td>
+<td>allOf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>0 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>status</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"ok"</code>, <code>"error"</code>)</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>event</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>data</td>
+<td>any</td>
+<td>Event-specific payload</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.event</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"roomCode"</code>)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data</td>
+<td>string</td>
+<td>Hex room code to share with other players</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Examples of payload <em>(generated)</em></p>
+</blockquote>
+<pre><code class="language-json">{
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;event&quot;: &quot;roomCode&quot;,
+  &quot;data&quot;: &quot;3fa2&quot;
+}
+</code></pre>
+<h4 id="message-join-success-joinsuccessresponse">Message Join Success <code>joinSuccessResponse</code></h4>
+<p><em>Acknowledgement that joinRoom succeeded; the socket is now in the room</em></p>
+<h5 id="payload_10">Payload</h5>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(root)</td>
+<td>allOf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>0 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>status</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"ok"</code>, <code>"error"</code>)</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>event</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>data</td>
+<td>any</td>
+<td>Event-specific payload</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.event</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"joinSuccess"</code>)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Examples of payload <em>(generated)</em></p>
+</blockquote>
+<pre><code class="language-json">{
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;event&quot;: &quot;joinSuccess&quot;,
+  &quot;data&quot;: null
+}
+</code></pre>
+<h4 id="message-join-notification-joinnotification">Message Join Notification <code>joinNotification</code></h4>
+<p>*Broadcast to ALL existing members of a room when a new player joins. (The joining player receives joinSuccess instead.)
+*</p>
+<h5 id="payload_11">Payload</h5>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(root)</td>
+<td>allOf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>0 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>status</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"ok"</code>, <code>"error"</code>)</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>event</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>data</td>
+<td>any</td>
+<td>Event-specific payload</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.event</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"joinNotification"</code>)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.data.name</td>
+<td>string</td>
+<td>Display name of the player who just joined</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Examples of payload <em>(generated)</em></p>
+</blockquote>
+<pre><code class="language-json">{
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;event&quot;: &quot;joinNotification&quot;,
+  &quot;data&quot;: {
+    &quot;name&quot;: &quot;string&quot;
+  }
+}
+</code></pre>
+<h4 id="message-leave-success-leavesuccessresponse">Message Leave Success <code>leaveSuccessResponse</code></h4>
+<p><em>Acknowledgement that leaveRoom succeeded; the socket is no longer in a room</em></p>
+<h5 id="payload_12">Payload</h5>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(root)</td>
+<td>allOf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>0 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>status</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"ok"</code>, <code>"error"</code>)</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>event</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>data</td>
+<td>any</td>
+<td>Event-specific payload</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.event</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"leaveSuccess"</code>)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Examples of payload <em>(generated)</em></p>
+</blockquote>
+<pre><code class="language-json">{
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;event&quot;: &quot;leaveSuccess&quot;,
+  &quot;data&quot;: null
+}
+</code></pre>
+<h4 id="message-leave-notification-leavenotification">Message Leave Notification <code>leaveNotification</code></h4>
+<p><em>Broadcast to remaining room members when a player leaves</em></p>
+<h5 id="payload_13">Payload</h5>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(root)</td>
+<td>allOf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>0 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>status</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"ok"</code>, <code>"error"</code>)</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>event</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>data</td>
+<td>any</td>
+<td>Event-specific payload</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.event</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"leaveNotification"</code>)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.data.name</td>
+<td>string</td>
+<td>Display name of the player who left</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Examples of payload <em>(generated)</em></p>
+</blockquote>
+<pre><code class="language-json">{
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;event&quot;: &quot;leaveNotification&quot;,
+  &quot;data&quot;: {
+    &quot;name&quot;: &quot;string&quot;
+  }
+}
+</code></pre>
+<h4 id="message-game-start-gamestart">Message Game Start <code>gameStart</code></h4>
+<p>*Broadcast to all room members when a game is started. Contains the full board; clients should start their timers.
+*</p>
+<h5 id="payload_14">Payload</h5>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(root)</td>
+<td>allOf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>0 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>status</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"ok"</code>, <code>"error"</code>)</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>event</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>data</td>
+<td>any</td>
+<td>Event-specific payload</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.event</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"gameStart"</code>)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data</td>
+<td>object</td>
+<td>A fully solved 4×4 Boggle board</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.data.squares</td>
+<td>array<string></td>
+<td>16 letter tiles in row-major order (index 0 = top-left, 15 = bottom-right). "Qu" is a possible tile value.</td>
+<td>-</td>
+<td>16 items</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.squares (single item)</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.words</td>
+<td>array<string></td>
+<td>Every valid word findable on this board (lower-case, sorted)</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.words (single item)</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.inProgress</td>
+<td>boolean</td>
+<td>True while the game timer is running</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.duration</td>
+<td>integer</td>
+<td>Game length in seconds (controlled by GAME_LENGTH env var)</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.expectedResponseCount</td>
+<td>integer</td>
+<td>Number of players from whom the server is expecting foundWords</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Examples of payload <em>(generated)</em></p>
+</blockquote>
+<pre><code class="language-json">{
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;event&quot;: &quot;gameStart&quot;,
+  &quot;data&quot;: {
+    &quot;squares&quot;: [
+      &quot;A&quot;,
+      &quot;E&quot;,
+      &quot;T&quot;,
+      &quot;S&quot;,
+      &quot;R&quot;,
+      &quot;I&quot;,
+      &quot;N&quot;,
+      &quot;O&quot;,
+      &quot;L&quot;,
+      &quot;D&quot;,
+      &quot;U&quot;,
+      &quot;H&quot;,
+      &quot;G&quot;,
+      &quot;W&quot;,
+      &quot;E&quot;,
+      &quot;N&quot;
+    ],
+    &quot;words&quot;: [
+      &quot;string&quot;
+    ],
+    &quot;inProgress&quot;: true,
+    &quot;duration&quot;: 0,
+    &quot;expectedResponseCount&quot;: 0
+  }
+}
+</code></pre>
+<h4 id="message-game-end-gameend">Message Game End <code>gameEnd</code></h4>
+<p>*Broadcast to all room members when the server-side timer expires. Players should submit their foundWords after receiving this.
+*</p>
+<h5 id="payload_15">Payload</h5>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(root)</td>
+<td>allOf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>0 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>status</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"ok"</code>, <code>"error"</code>)</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>event</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>data</td>
+<td>any</td>
+<td>Event-specific payload</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.event</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"gameEnd"</code>)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Examples of payload <em>(generated)</em></p>
+</blockquote>
+<pre><code class="language-json">{
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;event&quot;: &quot;gameEnd&quot;,
+  &quot;data&quot;: &quot;Clock ran out&quot;
+}
+</code></pre>
+<h4 id="message-game-results-gameresults">Message Game Results <code>gameResults</code></h4>
+<p>*Broadcast to all room members once every player has submitted foundWords. Contains full scoring details.
+*</p>
+<h5 id="payload_16">Payload</h5>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(root)</td>
+<td>allOf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>0 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>status</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"ok"</code>, <code>"error"</code>)</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>event</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>data</td>
+<td>any</td>
+<td>Event-specific payload</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.event</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"gameResults"</code>)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.data.winners</td>
+<td>array<string></td>
+<td>Socket IDs of the player(s) with the highest score. Use the connection ID received on connect to identify yourself.</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.winners (single item)</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.unfoundWords</td>
+<td>array<string></td>
+<td>Words on the board that no player submitted</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.unfoundWords (single item)</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.responses</td>
+<td>object</td>
+<td>Map of socketId → scored player result</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.responses (additional properties)</td>
+<td>object</td>
+<td>One player's scored result after a game</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.data.responses.name</td>
+<td>string</td>
+<td>Display name of the player</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.responses.words</td>
+<td>array<string></td>
+<td>All words submitted by this player (upper-cased, sorted)</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.responses.words (single item)</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.responses.uniqueWords</td>
+<td>array<string></td>
+<td>Words found only by this player (used for scoring)</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.responses.uniqueWords (single item)</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.responses.score</td>
+<td>integer</td>
+<td>Points earned from unique words only. 3-4 letter words = 1pt, 5 = 2pt, 6 = 3pt, 7+ = 11pt.</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Examples of payload <em>(generated)</em></p>
+</blockquote>
+<pre><code class="language-json">{
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;event&quot;: &quot;gameResults&quot;,
+  &quot;data&quot;: {
+    &quot;winners&quot;: [
+      &quot;string&quot;
+    ],
+    &quot;unfoundWords&quot;: [
+      &quot;string&quot;
+    ],
+    &quot;responses&quot;: {
+      &quot;property1&quot;: {
+        &quot;name&quot;: &quot;string&quot;,
+        &quot;words&quot;: [
+          &quot;string&quot;
+        ],
+        &quot;uniqueWords&quot;: [
+          &quot;string&quot;
+        ],
+        &quot;score&quot;: 0
+      },
+      &quot;property2&quot;: {
+        &quot;name&quot;: &quot;string&quot;,
+        &quot;words&quot;: [
+          &quot;string&quot;
+        ],
+        &quot;uniqueWords&quot;: [
+          &quot;string&quot;
+        ],
+        &quot;score&quot;: 0
+      }
+    }
+  }
+}
+</code></pre>
+<h4 id="message-board-history-count-boardhistorycountresponse">Message Board History Count <code>boardHistoryCountResponse</code></h4>
+<p>*Response to boardHistoryCount. Also pushed automatically to any socket whose roomCode is 'homePage' whenever new boards are generated.
+*</p>
+<h5 id="payload_17">Payload</h5>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(root)</td>
+<td>allOf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>0 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>status</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"ok"</code>, <code>"error"</code>)</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>event</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>data</td>
+<td>any</td>
+<td>Event-specific payload</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.event</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"boardHistoryCount"</code>)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.data.history</td>
+<td>array<object></td>
+<td>Board generation history records from the SQLite database</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.history.timestamp</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>format (<code>date-time</code>)</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Examples of payload <em>(generated)</em></p>
+</blockquote>
+<pre><code class="language-json">{
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;event&quot;: &quot;boardHistoryCount&quot;,
+  &quot;data&quot;: {
+    &quot;history&quot;: [
+      {
+        &quot;timestamp&quot;: &quot;2019-08-24T14:15:22Z&quot;
+      }
+    ]
+  }
+}
+</code></pre>
+<h4 id="message-solo-board-soloboardresponse">Message Solo Board <code>soloBoardResponse</code></h4>
+<p><em>Response to browserPlay_soloBoard — a fresh board for in-browser solo play</em></p>
+<h5 id="payload_18">Payload</h5>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(root)</td>
+<td>allOf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>0 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>status</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"ok"</code>, <code>"error"</code>)</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>event</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>data</td>
+<td>any</td>
+<td>Event-specific payload</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.event</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"soloBoard"</code>)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data</td>
+<td>object</td>
+<td>A fully solved 4×4 Boggle board</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.data.squares</td>
+<td>array<string></td>
+<td>16 letter tiles in row-major order (index 0 = top-left, 15 = bottom-right). "Qu" is a possible tile value.</td>
+<td>-</td>
+<td>16 items</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.squares (single item)</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.words</td>
+<td>array<string></td>
+<td>Every valid word findable on this board (lower-case, sorted)</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.words (single item)</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.inProgress</td>
+<td>boolean</td>
+<td>True while the game timer is running</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.duration</td>
+<td>integer</td>
+<td>Game length in seconds (controlled by GAME_LENGTH env var)</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.expectedResponseCount</td>
+<td>integer</td>
+<td>Number of players from whom the server is expecting foundWords</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Examples of payload <em>(generated)</em></p>
+</blockquote>
+<pre><code class="language-json">{
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;event&quot;: &quot;soloBoard&quot;,
+  &quot;data&quot;: {
+    &quot;squares&quot;: [
+      &quot;A&quot;,
+      &quot;E&quot;,
+      &quot;T&quot;,
+      &quot;S&quot;,
+      &quot;R&quot;,
+      &quot;I&quot;,
+      &quot;N&quot;,
+      &quot;O&quot;,
+      &quot;L&quot;,
+      &quot;D&quot;,
+      &quot;U&quot;,
+      &quot;H&quot;,
+      &quot;G&quot;,
+      &quot;W&quot;,
+      &quot;E&quot;,
+      &quot;N&quot;
+    ],
+    &quot;words&quot;: [
+      &quot;string&quot;
+    ],
+    &quot;inProgress&quot;: true,
+    &quot;duration&quot;: 0,
+    &quot;expectedResponseCount&quot;: 0
+  }
+}
+</code></pre>
+<h4 id="message-definition-definitionresponse">Message Definition <code>definitionResponse</code></h4>
+<p><em>Response to a definition request</em></p>
+<h5 id="payload_19">Payload</h5>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(root)</td>
+<td>allOf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>0 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>status</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"ok"</code>, <code>"error"</code>)</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>event</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>data</td>
+<td>any</td>
+<td>Event-specific payload</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.event</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"definition"</code>)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.data.word</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.definition</td>
+<td>string</td>
+<td>Present on success</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data.error</td>
+<td>string</td>
+<td>Present when lookup failed</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Examples of payload <em>(generated)</em></p>
+</blockquote>
+<pre><code class="language-json">{
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;event&quot;: &quot;definition&quot;,
+  &quot;data&quot;: {
+    &quot;word&quot;: &quot;string&quot;,
+    &quot;definition&quot;: &quot;string&quot;,
+    &quot;error&quot;: &quot;string&quot;
+  }
+}
+</code></pre>
+<h4 id="message-error-errorresponse">Message Error <code>errorResponse</code></h4>
+<p>*Returned whenever a message fails JSON parsing, schema validation, API token checking, or business-logic rules (e.g. wrong room state).
+*</p>
+<h5 id="payload_20">Payload</h5>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Value</th>
+<th>Constraints</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(root)</td>
+<td>allOf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>0 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>status</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"ok"</code>, <code>"error"</code>)</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>event</td>
+<td>string</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>required</strong></td>
+</tr>
+<tr>
+<td>data</td>
+<td>any</td>
+<td>Event-specific payload</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1 (allOf item)</td>
+<td>object</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+<tr>
+<td>1.status</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"error"</code>)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.event</td>
+<td>string</td>
+<td>-</td>
+<td>allowed (<code>"error"</code>)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1.data</td>
+<td>any</td>
+<td>Error details. Either a plain string or an AJV error array when the message failed JSON Schema validation.</td>
+<td>-</td>
+<td>-</td>
+<td><strong>additional properties are allowed</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Examples of payload <em>(generated)</em></p>
+</blockquote>
+<pre><code class="language-json">{
+  &quot;status&quot;: &quot;error&quot;,
+  &quot;event&quot;: &quot;error&quot;,
+  &quot;data&quot;: null
+}
+</code></pre>
+</section>
+
+            </main>
+        </div>
+        <hr><footer>
+    <div class="terminal-mkdocs-footer-grid">
+        <div id="terminal-mkdocs-footer-copyright-info">
+             Site built with <a href="http://www.mkdocs.org">MkDocs</a> and <a href="https://github.com/ntno/mkdocs-terminal">Terminal for MkDocs</a>.
+        </div>
+    </div>
+</footer>
+    </div>
+
+    
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="alertdialog" aria-modal="true" aria-labelledby="searchModalLabel">
+    <div class="modal-dialog modal-lg" role="search">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="searchModalLabel">Search</h5>
+                <button type="button" class="close btn btn-default btn-ghost" data-dismiss="modal" aria-label="Close">x</button>
+            </div>
+            <div class="modal-body">
+                <p id="searchInputLabel">Type to start searching</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" aria-labelledby="searchInputLabel" placeholder="" id="mkdocs-search-query" title="Please enter search terms here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No document matches found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+    
+    
+</body>
+
+</html>

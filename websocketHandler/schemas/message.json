@@ -1,29 +1,15 @@
 {
     "properties": {
-        "status":
-        {
-            "type": "string",
-            "enum": ["ok", "error"]
-        },
         "event":
         {
             "type": "string",
             "enum": [
                 "createRoom",
                 "joinRoom",
-                "joinNotification",
-                "joinSuccess",
-
+                "leaveRoom",
                 "startGame",
-                "gameEnd",
-                "gameResults",
                 "foundWords",
-
-                "error",
-                "response",
-
                 "boardHistoryCount",
-
                 "browserPlay_soloBoard",
                 "definition"
             ]
@@ -31,14 +17,9 @@
         "data":
         {
             "type": "object"
-        },
-        "apiToken":
-        {
-            "type": "string"
         }
     },
     "required": [
-        "status",
         "event"
     ],
     "type":"object"

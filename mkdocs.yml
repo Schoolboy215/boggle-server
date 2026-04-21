@@ -1,0 +1,8 @@
+site_name: Boggle Server API Docs
+site_url: ""
+docs_dir: docs
+theme:
+  name: terminal
+nav:
+  - Home: index.md
+  - WebSocket API: asyncapi.md
